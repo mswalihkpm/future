@@ -201,27 +201,27 @@ export default function CustomSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`w-full flex items-center justify-between gap-2 bg-white text-slate-900 border transition-all duration-200 shadow-2xs outline-none ${
+        className={`w-full flex items-center justify-between gap-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border transition-all duration-200 shadow-2xs outline-none ${
           isOpen
-            ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-sm'
-            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
-        } ${disabled ? 'opacity-50 cursor-not-allowed bg-slate-100' : 'cursor-pointer'} ${sizeClasses} ${triggerClassName}`}
+            ? 'border-blue-600 dark:border-blue-500 ring-2 ring-blue-500/20 shadow-sm'
+            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/50'
+        } ${disabled ? 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800' : 'cursor-pointer'} ${sizeClasses} ${triggerClassName}`}
       >
         <div className="flex items-center space-x-2 truncate">
-          {icon && <span className="shrink-0 text-slate-400">{icon}</span>}
-          <span className={`truncate ${!selectedOption ? 'text-slate-400 font-normal' : 'text-slate-900 font-semibold'}`}>
+          {icon && <span className="shrink-0 text-slate-400 dark:text-slate-500">{icon}</span>}
+          <span className={`truncate ${!selectedOption ? 'text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-slate-100 font-semibold'}`}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
 
         <div className="flex items-center space-x-1.5 shrink-0 ml-1">
           {selectedOption?.badge && (
-            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               {selectedOption.badge}
             </span>
           )}
           <ChevronDown
-            className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600' : ''}`}
+            className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`}
           />
         </div>
       </button>
@@ -230,20 +230,20 @@ export default function CustomSelect({
       {isOpen && (
         <div
           role="listbox"
-          className={`absolute left-0 right-0 mt-1.5 z-[100] min-w-[200px] max-h-64 overflow-hidden bg-white border border-slate-200/90 rounded-2xl shadow-2xl ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95 duration-150 flex flex-col ${menuClassName}`}
+          className={`absolute left-0 right-0 mt-1.5 z-[100] min-w-[200px] max-h-64 overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10 animate-in fade-in-0 zoom-in-95 duration-150 flex flex-col ${menuClassName}`}
         >
           {/* Search Box */}
           {isSearchable && (
-            <div className="p-2 border-b border-slate-100 bg-slate-50/70 shrink-0">
+            <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/70 shrink-0">
               <div className="relative flex items-center">
-                <Search className="w-3.5 h-3.5 absolute left-2.5 text-slate-400 pointer-events-none" />
+                <Search className="w-3.5 h-3.5 absolute left-2.5 text-slate-400 dark:text-slate-500 pointer-events-none" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Type to search..."
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -253,7 +253,7 @@ export default function CustomSelect({
           {/* Options List */}
           <div ref={optionsListRef} className="overflow-y-auto p-1.5 space-y-0.5 max-h-52 scrollbar-thin">
             {filteredOptions.length === 0 ? (
-              <div className="p-3 text-center text-xs text-slate-400 font-medium">
+              <div className="p-3 text-center text-xs text-slate-400 dark:text-slate-500 font-medium">
                 No matching options found
               </div>
             ) : (
@@ -274,10 +274,10 @@ export default function CustomSelect({
                         opt.disabled
                           ? 'opacity-40 cursor-not-allowed text-slate-400'
                           : isSelected
-                          ? 'bg-blue-50 text-blue-900 font-bold'
+                          ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 font-bold'
                           : isHighlighted
-                          ? 'bg-slate-100 text-slate-900'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                       }`}
                     >
                       <div className="flex items-center space-x-2 truncate">
@@ -285,11 +285,11 @@ export default function CustomSelect({
                       </div>
                       <div className="flex items-center space-x-1.5 shrink-0 ml-2">
                         {opt.badge && (
-                          <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                          <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                             {opt.badge}
                           </span>
                         )}
-                        {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
                       </div>
                     </div>
                   );
@@ -298,7 +298,7 @@ export default function CustomSelect({
                 {/* Grouped options */}
                 {Object.entries(groupedOptions.groups).map(([groupName, groupOpts]) => (
                   <div key={groupName} className="pt-1.5 first:pt-0">
-                    <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50 rounded-lg">
+                    <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-slate-800/50 rounded-lg">
                       {groupName}
                     </div>
                     <div className="mt-0.5 space-y-0.5">
@@ -314,8 +314,8 @@ export default function CustomSelect({
                               opt.disabled
                                 ? 'opacity-40 cursor-not-allowed text-slate-400'
                                 : isSelected
-                                ? 'bg-blue-50 text-blue-900 font-bold'
-                                : 'text-slate-700 hover:bg-slate-50'
+                                ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 font-bold'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                             }`}
                           >
                             <div className="flex items-center space-x-2 truncate">
@@ -323,11 +323,11 @@ export default function CustomSelect({
                             </div>
                             <div className="flex items-center space-x-1.5 shrink-0 ml-2">
                               {opt.badge && (
-                                <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                                <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                   {opt.badge}
                                 </span>
                               )}
-                              {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                              {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
                             </div>
                           </div>
                         );

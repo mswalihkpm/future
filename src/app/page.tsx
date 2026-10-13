@@ -33,6 +33,7 @@ import PublicFooter from '@/components/layout/PublicFooter';
 import { getAcademicMasterData } from '@/lib/academic-client';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAppBootstrap } from '@/context/AppBootstrapContext';
+import { useTheme } from '@/context/ThemeContext';
 
 // Global module-level client memory caches for instant 0ms loading
 const homeLeaderboardMemory = new Map<string, any[]>();
@@ -104,6 +105,40 @@ export default function PublicHomePage() {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportingStudent, setReportingStudent] = useState<any | null>(null);
   const [selectedNews, setSelectedNews] = useState<any | null>(null);
+
+  // Dark/Light Theme Support & Secret Triple-Click on Imaginary Box
+  const { theme, isDark, toggleTheme } = useTheme();
+  const secretClickCountRef = useRef(0);
+  const secretClickTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [themeNotification, setThemeNotification] = useState<{ visible: boolean; mode: 'dark' | 'light' }>({
+    visible: false,
+    mode: 'light',
+  });
+
+  const handleSecretBoxTripleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    secretClickCountRef.current += 1;
+
+    if (secretClickTimerRef.current) {
+      clearTimeout(secretClickTimerRef.current);
+    }
+
+    if (secretClickCountRef.current >= 3) {
+      secretClickCountRef.current = 0;
+      const targetMode = isDark ? 'light' : 'dark';
+      toggleTheme();
+      setThemeNotification({ visible: true, mode: targetMode });
+      setTimeout(() => {
+        setThemeNotification((prev) => ({ ...prev, visible: false }));
+      }, 1600);
+    } else {
+      secretClickTimerRef.current = setTimeout(() => {
+        secretClickCountRef.current = 0;
+      }, 1200);
+    }
+  };
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
@@ -362,11 +397,21 @@ export default function PublicHomePage() {
   const top3 = leaderboard.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col selection:bg-blue-600 selection:text-white antialiased">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white antialiased transition-colors duration-300">
+      {/* Secret Toast Indicator upon successful 3-click trigger */}
+      {themeNotification.visible && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-slide-down">
+          <div className="px-4 py-2 rounded-full bg-slate-900/95 dark:bg-slate-100/95 text-white dark:text-slate-900 shadow-2xl backdrop-blur-md text-xs font-black flex items-center space-x-2 border border-white/20 dark:border-slate-800/20">
+            <span className="text-sm">{themeNotification.mode === 'dark' ? '🌙' : '☀️'}</span>
+            <span>{themeNotification.mode === 'dark' ? 'Dark Mode Activated' : 'Light Mode Activated'}</span>
+          </div>
+        </div>
+      )}
+
       {/* Header with Very Low Opacity & Backdrop Blur */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 animate-slide-down bg-white/20 backdrop-blur-md border-b border-white/30 shadow-xs print:hidden ${
-          scrolled ? 'py-2.5 sm:py-3 bg-white/25' : 'py-3 sm:py-4 bg-white/15'
+        className={`sticky top-0 z-40 transition-all duration-300 animate-slide-down bg-white/20 dark:bg-slate-950/45 backdrop-blur-md border-b border-white/30 dark:border-slate-800/40 shadow-xs print:hidden ${
+          scrolled ? 'py-2.5 sm:py-3 bg-white/25 dark:bg-slate-950/60' : 'py-3 sm:py-4 bg-white/15 dark:bg-slate-950/35'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -385,10 +430,10 @@ export default function PublicHomePage() {
             <div>
               {/* Desktop Branding */}
               <div className="hidden sm:block">
-                <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-tight">
+                <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                   MADIN SCHOOL OF EXCELLENCE
                 </h1>
-                <div className="text-[11px] font-bold text-blue-600 tracking-wider uppercase flex items-center space-x-1.5 mt-0.5">
+                <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase flex items-center space-x-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>SPR Evaluation Platform</span>
                 </div>
@@ -396,7 +441,7 @@ export default function PublicHomePage() {
 
               {/* Clean Mobile Branding without fire icon */}
               <div className="sm:hidden flex flex-col">
-                <div className="text-[11px] font-black tracking-tight text-slate-900 uppercase leading-none">
+                <div className="text-[11px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
                   MADIN EXCELLENCE
                 </div>
                 <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
@@ -410,18 +455,18 @@ export default function PublicHomePage() {
           <div className="flex items-center space-x-2">
             <Link
               href="/updates"
-              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 hover:bg-amber-50 text-slate-700 hover:text-amber-600 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs btn-interactive"
+              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs border border-transparent dark:border-slate-800 btn-interactive"
               title="Official News & Announcements"
               aria-label="Updates"
             >
-              <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+              <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
             </Link>
             <button
               onClick={() => {
                 setMobileSearchOpen(true);
                 setTimeout(() => mobileSearchInputRef.current?.focus(), 100);
               }}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 hover:bg-blue-50 text-slate-700 hover:text-blue-600 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs btn-interactive"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-blue-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs border border-transparent dark:border-slate-800 btn-interactive"
               title="Search Students"
               aria-label="Search"
             >
@@ -429,19 +474,19 @@ export default function PublicHomePage() {
             </button>
             <Link
               href="/leaderboard"
-              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 hover:bg-amber-50 text-slate-700 hover:text-amber-600 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs btn-interactive"
+              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs border border-transparent dark:border-slate-800 btn-interactive"
               title="Open Full Standings"
               aria-label="Leaderboard"
             >
-              <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+              <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
             </Link>
             <Link
               href="/categories"
-              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs btn-interactive"
+              className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-indigo-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs border border-transparent dark:border-slate-800 btn-interactive"
               title="Evaluation Categories & Wings"
               aria-label="Categories"
             >
-              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
+              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 dark:text-indigo-400" />
             </Link>
           </div>
         </div>
@@ -450,10 +495,10 @@ export default function PublicHomePage() {
       {/* Mobile Search Modal Overlay */}
       {mobileSearchOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-start justify-center p-4 pt-16 sm:hidden animate-fade-in">
-          <div className="bg-white rounded-3xl w-full max-w-md p-4 shadow-2xl border border-slate-200 space-y-3 animate-scale-in">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center space-x-2 text-slate-800">
-                <Search className="w-4 h-4 text-blue-600" />
+          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-4 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-3 animate-scale-in">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center space-x-2 text-slate-800 dark:text-slate-200">
+                <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-xs font-bold uppercase tracking-wider">Search SPR Students</span>
               </div>
               <button
@@ -461,13 +506,13 @@ export default function PublicHomePage() {
                   setMobileSearchOpen(false);
                   setSearchQuery('');
                 }}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="relative bg-slate-50 rounded-2xl border border-slate-200 p-1 flex items-center focus-within:ring-2 focus-within:ring-blue-600">
+            <div className="relative bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-1 flex items-center focus-within:ring-2 focus-within:ring-blue-600">
               <Search className="w-4 h-4 text-slate-400 ml-2.5 shrink-0" />
               <input
                 ref={mobileSearchInputRef}
@@ -475,7 +520,7 @@ export default function PublicHomePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Enter student name, ID (e.g. MSOE, SPR), or class..."
-                className="w-full px-2.5 py-2 text-xs text-slate-900 bg-transparent outline-none font-semibold"
+                className="w-full px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-transparent outline-none font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
               {searchQuery && (
                 <button
@@ -483,7 +528,7 @@ export default function PublicHomePage() {
                     setSearchQuery('');
                     setSearchResults([]);
                   }}
-                  className="p-1 text-slate-400 hover:text-slate-700 mr-1.5"
+                  className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 mr-1.5"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -496,7 +541,7 @@ export default function PublicHomePage() {
                 <VideoLoader size="sm" text="Searching registry..." />
               </div>
             ) : searchResults.length > 0 ? (
-              <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 rounded-2xl border border-slate-100 bg-white">
+              <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                 {searchResults.map((st) => (
                   <button
                     key={st.id}
@@ -504,21 +549,21 @@ export default function PublicHomePage() {
                       setMobileSearchOpen(false);
                       handleStudentClick(st.id);
                     }}
-                    className="w-full p-2.5 text-left hover:bg-blue-50/80 flex items-center justify-between transition"
+                    className="w-full p-2.5 text-left hover:bg-blue-50/80 dark:hover:bg-slate-800/80 flex items-center justify-between transition"
                   >
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <StudentAvatar photoUrl={st.photoUrl} name={st.fullName} size="sm" />
                       <div className="min-w-0">
-                        <div className="text-xs font-bold text-slate-900 truncate">{st.fullName}</div>
-                        <div className="text-[10px] text-slate-500 font-medium truncate flex items-center space-x-1 mt-0.5">
-                          <span className="font-mono font-bold text-blue-700 bg-blue-50 px-1 py-0.2 rounded border border-blue-200 text-[9px]">
+                        <div className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{st.fullName}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center space-x-1 mt-0.5">
+                          <span className="font-mono font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 px-1 py-0.2 rounded border border-blue-200 dark:border-blue-800 text-[9px]">
                             {st.sprStudentId || st.studentId}
                           </span>
                           <span>• Standard {formatClassNumber(st.className)}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 ml-2">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 ml-2">
                       <Trophy className="w-3 h-3" />
                     </div>
                   </button>
@@ -535,14 +580,26 @@ export default function PublicHomePage() {
 
       {/* Top Hero Section with Rich Sunset Mosque Background (Clarity & Vivid Colors) */}
       <section className="relative overflow-hidden pt-8 pb-6 sm:pt-10 sm:pb-8 print:hidden">
+        {/* Secret Imaginary Box for Theme Toggle (Click 3 times to switch Dark/Light mode) */}
+        <div
+          onClick={handleSecretBoxTripleClick}
+          className="absolute top-0 left-0 w-[34%] sm:w-[28%] md:w-[26%] lg:w-[24%] h-[68%] sm:h-[75%] z-25 cursor-default select-none pointer-events-auto"
+          aria-hidden="true"
+        />
+
         {/* Rich Sunset Mosque Background Image with High Clarity */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.70] pointer-events-none select-none"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.70] dark:opacity-[0.62] pointer-events-none select-none transition-opacity duration-500"
           style={{ backgroundImage: "url('/hero-bg.jpg')", height: '90%' }}
         />
-        {/* Soft, Transparent Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/30 via-65% to-[#f8fafc] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/80 to-transparent pointer-events-none" />
+        {/* Light black shadow on the background image in homepage when the app is in dark mode */}
+        <div
+          className="absolute inset-0 bg-black/0 dark:bg-black/55 pointer-events-none transition-colors duration-500"
+          style={{ height: '90%' }}
+        />
+        {/* Soft, Transparent Gradient blending seamlessly into light and dark page backgrounds */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/30 via-65% to-[#f8fafc] dark:from-transparent dark:via-[#080e1e]/40 dark:to-[#080e1e] pointer-events-none transition-colors duration-500" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/80 to-transparent dark:from-[#080e1e] dark:via-[#080e1e]/90 dark:to-transparent pointer-events-none transition-colors duration-500" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Content with Smooth Staggered Slide-In & Harmonious Sunset Lighting */}
@@ -562,7 +619,7 @@ export default function PublicHomePage() {
 
             {/* Quick Student Search Box (Desktop Only; on mobile it is accessed via Header search icon) */}
             <div ref={searchContainerRef} className="hidden sm:block pt-2 max-w-2xl mx-auto relative z-30 text-left animate-slide-up delay-150">
-              <div className="relative bg-white rounded-2xl shadow-xl shadow-slate-300/40 border-2 border-slate-200/90 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/15 transition-all p-1.5 sm:p-2 flex items-center">
+              <div className="relative bg-white dark:bg-slate-900/90 rounded-2xl shadow-xl shadow-slate-300/40 dark:shadow-black/50 border-2 border-slate-200/90 dark:border-slate-800 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/15 transition-all p-1.5 sm:p-2 flex items-center">
                 <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 ml-2.5 shrink-0" />
                 <input
                   type="text"
@@ -578,7 +635,7 @@ export default function PublicHomePage() {
                   }}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search student by name (e.g. Irfan, Swalih), ID, or Class..."
-                  className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 bg-transparent outline-none font-semibold"
+                  className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-transparent outline-none font-semibold"
                 />
                 {searching && (
                   <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3 shrink-0" />
@@ -590,7 +647,7 @@ export default function PublicHomePage() {
                       setSearchResults([]);
                       setShowSearchDropdown(false);
                     }}
-                    className="p-1 text-slate-400 hover:text-slate-700 mr-2 rounded-full hover:bg-slate-100"
+                    className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 mr-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -599,44 +656,44 @@ export default function PublicHomePage() {
 
               {/* Completely Opaque Isolated Search Dropdown (z-[100]) */}
               {showSearchDropdown && searchQuery.trim().length >= 1 && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-[100] max-h-80 overflow-y-auto animate-slide-up">
+                <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-[100] max-h-80 overflow-y-auto animate-slide-up">
                   {searching ? (
                     <div className="py-6 px-4 flex items-center justify-center">
                       <VideoLoader size="sm" text="Searching students..." subtext="SPR Registry" />
                     </div>
                   ) : searchResults.length > 0 ? (
                     <>
-                      <div className="p-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-bold">
+                      <div className="p-2.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                         <span>Found {searchResults.length} Students</span>
                         <button
                           onClick={() => setShowSearchDropdown(false)}
-                          className="text-slate-400 hover:text-slate-700 p-1"
+                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                      <div className="divide-y divide-slate-100 bg-white">
+                      <div className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         {searchResults.map((st) => (
                           <button
                             key={st.id}
                             onClick={() => handleStudentClick(st.id)}
-                            className="w-full px-3.5 py-2.5 text-left bg-white hover:bg-blue-50/80 flex items-center justify-between group transition-colors duration-150"
+                            className="w-full px-3.5 py-2.5 text-left bg-white dark:bg-slate-900 hover:bg-blue-50/80 dark:hover:bg-slate-800/80 flex items-center justify-between group transition-colors duration-150"
                           >
                             <div className="flex items-center space-x-2.5 min-w-0">
                               <StudentAvatar photoUrl={st.photoUrl} name={st.fullName} size="sm" />
                               <div className="min-w-0">
-                                <div className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                                   {st.fullName}
                                 </div>
-                                <div className="text-[10px] text-slate-500 font-medium truncate flex items-center space-x-1 mt-0.5">
-                                  <span className="font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 text-[9.5px]">
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center space-x-1 mt-0.5">
+                                  <span className="font-mono font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 px-1.5 py-0.2 rounded border border-blue-200 dark:border-blue-800 text-[9.5px]">
                                     {st.sprStudentId || st.studentId}
                                   </span>
                                   <span>• Standard {formatClassNumber(st.className)} {st.division ? `(${st.division})` : ''} {st.schoolName ? `• ${st.schoolName}` : ''}</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition shadow-2xs shrink-0 ml-2">
+                            <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition shadow-2xs shrink-0 ml-2">
                               <Trophy className="w-3 h-3" />
                             </div>
                           </button>
@@ -644,9 +701,9 @@ export default function PublicHomePage() {
                       </div>
                     </>
                   ) : (
-                    <div className="py-6 px-4 text-center text-xs text-slate-500">
-                      <p>No students found for &ldquo;<span className="font-semibold text-slate-800">{searchQuery}</span>&rdquo;</p>
-                      <p className="text-[11px] text-slate-400 mt-1">Try searching by student name, ID code (e.g. MSOE), or class number.</p>
+                    <div className="py-6 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+                      <p>No students found for &ldquo;<span className="font-semibold text-slate-800 dark:text-slate-200">{searchQuery}</span>&rdquo;</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Try searching by student name, ID code (e.g. MSOE), or class number.</p>
                     </div>
                   )}
                 </div>
@@ -655,22 +712,22 @@ export default function PublicHomePage() {
 
             {/* Quick Counters */}
             <div className="pt-2 grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto relative z-10">
-              <div className="p-2.5 sm:p-3.5 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200/90 shadow-sm animate-slide-left delay-200 card-interactive flex flex-col items-center justify-center text-center">
-                <div className="text-xl sm:text-2xl font-black text-blue-600 flex items-center justify-center space-x-1.5 text-center">
+              <div className="p-2.5 sm:p-3.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm animate-slide-left delay-200 card-interactive flex flex-col items-center justify-center text-center">
+                <div className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-center space-x-1.5 text-center">
                   {loadingLeaderboard ? (
-                    <span className="inline-flex items-center space-x-1 text-xs font-bold text-blue-600 animate-pulse">
-                      <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping inline-block mr-1"></span>
+                    <span className="inline-flex items-center space-x-1 text-xs font-bold text-blue-600 dark:text-blue-400 animate-pulse">
+                      <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 animate-ping inline-block mr-1"></span>
                       <span>Calculating...</span>
                     </span>
                   ) : (
                     <span>{leaderboard.length}</span>
                   )}
                 </div>
-                <div className="text-[11px] sm:text-xs font-semibold text-slate-600 mt-0.5 text-center">Evaluated Students</div>
+                <div className="text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5 text-center">Evaluated Students</div>
               </div>
-              <div className="p-2.5 sm:p-3.5 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200/90 shadow-sm animate-slide-right delay-200 card-interactive flex flex-col items-center justify-center text-center">
-                <div className="text-xl sm:text-2xl font-black text-indigo-600 text-center">6 Wings</div>
-                <div className="text-[11px] sm:text-xs font-semibold text-slate-600 mt-0.5 text-center">Curricular & Co-curricular</div>
+              <div className="p-2.5 sm:p-3.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm animate-slide-right delay-200 card-interactive flex flex-col items-center justify-center text-center">
+                <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 text-center">6 Wings</div>
+                <div className="text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5 text-center">Curricular & Co-curricular</div>
               </div>
             </div>
           </div>
@@ -678,7 +735,7 @@ export default function PublicHomePage() {
           {/* Loading Process Video Container */}
           {loadingLeaderboard && (
             <div className="mt-4 pb-6 relative z-10 flex justify-center animate-fade-in">
-              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-md max-w-sm w-full flex flex-col items-center justify-center text-center">
+              <div className="bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-md max-w-sm w-full flex flex-col items-center justify-center text-center">
                 <VideoLoader size="lg" text="Loading SPR Live Standings..." subtext="Accessing Student Performance Registry" />
               </div>
             </div>
@@ -688,11 +745,11 @@ export default function PublicHomePage() {
           {!loadingLeaderboard && top3.length >= 3 && (
             <div className="mt-2 pb-6 relative z-10">
               <div className="text-center mb-5 animate-slide-up delay-200">
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-50/90 px-3 py-1 rounded-full border border-blue-200 shadow-2xs">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-800 dark:text-blue-300 bg-blue-50/90 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800/80 shadow-2xs">
                   Top Institutional Honors
                 </span>
-                <h3 className="text-xl sm:text-3xl font-black text-slate-900 mt-1 drop-shadow-2xs">Overall SPR Champions</h3>
-                <p className="text-[11px] sm:text-sm text-slate-600 font-medium mt-0.5">Leading institutional benchmarks across all evaluation wings</p>
+                <h3 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1 drop-shadow-2xs">Overall SPR Champions</h3>
+                <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-0.5">Leading institutional benchmarks across all evaluation wings</p>
               </div>
 
               {/* Horizontal 3-card Podium (grid-cols-3 on mobile and desktop) */}
@@ -711,10 +768,10 @@ export default function PublicHomePage() {
                       onClick={() => handleStudentClick(student?.studentId)}
                       className={`cursor-pointer rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 border-2 transition-all duration-300 text-center relative order-1 group animate-slide-left delay-200 hover:-translate-y-1 ${
                         isGold
-                          ? 'bg-gradient-to-b from-amber-50/95 via-white to-white border-amber-400 shadow-xl hover:shadow-2xl hover:border-amber-500'
+                          ? 'bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500'
                           : isSilver
-                          ? 'bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-slate-400'
-                          : 'bg-white border-amber-200 shadow-lg hover:shadow-xl hover:border-amber-300'
+                          ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl hover:border-slate-400 dark:hover:border-slate-700'
+                          : 'bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-900/60 shadow-lg hover:shadow-xl hover:border-amber-300 dark:hover:border-amber-800'
                       }`}
                     >
                       <div className="flex justify-center mb-1.5 sm:mb-2">
@@ -722,39 +779,41 @@ export default function PublicHomePage() {
                           photoUrl={student?.photoUrl}
                           name={student?.studentName || student?.name || 'Student'}
                           size="lg"
-                          className={`w-11 h-11 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`}
+                          className={`w-11 h-11 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40' : ''}`}
                         />
                       </div>
                       <div
                         className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
                           isGold
-                            ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
                             : isSilver
-                            ? 'bg-slate-100/90 text-slate-700 border-slate-200'
-                            : 'bg-amber-100/90 text-amber-800 border-amber-200'
+                            ? 'bg-slate-100/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                            : 'bg-amber-100/90 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                         }`}
                       >
                         ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
                       </div>
                       <h4
                         className={`text-[10px] sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
-                          isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
+                          isGold
+                            ? 'text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-400'
+                            : 'text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'
                         }`}
                       >
                         {student?.studentName || student?.name}
                       </h4>
-                      <div className="text-[9px] sm:text-xs text-slate-500 font-medium mt-0.5">
+                      <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                         Std {formatClassNumber(student?.className)}
                       </div>
                       <div
                         className={`mt-1.5 sm:mt-4 pt-1.5 sm:pt-3 border-t flex items-center justify-center sm:justify-between ${
-                          isGold ? 'border-amber-100' : 'border-slate-100'
+                          isGold ? 'border-amber-100 dark:border-amber-950/60' : 'border-slate-100 dark:border-slate-800'
                         }`}
                       >
-                        <span className={`hidden sm:inline text-xs ${isGold ? 'text-amber-900 font-bold' : 'text-slate-400 font-medium'}`}>
+                        <span className={`hidden sm:inline text-xs ${isGold ? 'text-amber-900 dark:text-amber-300 font-bold' : 'text-slate-400 dark:text-slate-500 font-medium'}`}>
                           {isGold ? 'Cumulative' : 'Overall'}
                         </span>
-                        <span className={`text-[11px] sm:text-lg font-black ${isGold ? 'text-amber-800' : 'text-slate-800'}`}>
+                        <span className={`text-[11px] sm:text-lg font-black ${isGold ? 'text-amber-800 dark:text-amber-300' : 'text-slate-800 dark:text-slate-100'}`}>
                           {formatScore(student?.overallScore ?? student?.spr)} pts
                         </span>
                       </div>
@@ -772,28 +831,28 @@ export default function PublicHomePage() {
                   return (
                     <div
                       onClick={() => handleStudentClick(student?.studentId)}
-                      className={`cursor-pointer bg-gradient-to-b from-amber-50/95 via-white to-white rounded-2xl sm:rounded-3xl p-3 sm:p-7 border-2 border-amber-400 shadow-xl hover:shadow-2xl hover:border-amber-500 transition-all duration-300 text-center relative order-2 -translate-y-2 sm:-translate-y-4 group animate-zoom-up delay-100 hover:-translate-y-5`}
+                      className={`cursor-pointer bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 rounded-2xl sm:rounded-3xl p-3 sm:p-7 border-2 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500 transition-all duration-300 text-center relative order-2 -translate-y-2 sm:-translate-y-4 group animate-zoom-up delay-100 hover:-translate-y-5`}
                     >
                       <div className="flex justify-center mb-1.5 sm:mb-2">
                         <StudentAvatar
                           photoUrl={student?.photoUrl}
                           name={student?.studentName || student?.name || 'Student'}
                           size="xl"
-                          className="w-13 h-13 sm:w-24 sm:h-24 ring-3 sm:ring-4 ring-amber-300/60"
+                          className="w-13 h-13 sm:w-24 sm:h-24 ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40"
                         />
                       </div>
-                      <div className="text-[8px] sm:text-xs font-black text-amber-700 uppercase tracking-widest bg-amber-100 px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300">
+                      <div className="text-[8px] sm:text-xs font-black text-amber-700 dark:text-amber-300 uppercase tracking-widest bg-amber-100 dark:bg-amber-950/70 px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300 dark:border-amber-800">
                         ★ {rank === 1 ? '1st' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
                       </div>
-                      <h4 className="text-xs sm:text-lg font-black text-slate-900 group-hover:text-amber-800 mt-1 transition-colors leading-tight break-words">
+                      <h4 className="text-xs sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-400 mt-1 transition-colors leading-tight break-words">
                         {student?.studentName || student?.name}
                       </h4>
-                      <div className="text-[9px] sm:text-xs text-slate-500 font-medium mt-0.5">
+                      <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                         Std {formatClassNumber(student?.className)}
                       </div>
-                      <div className="mt-1.5 sm:mt-4 pt-1.5 sm:pt-3 border-t border-amber-100 flex items-center justify-center sm:justify-between">
-                        <span className="hidden sm:inline text-xs text-amber-900 font-bold">Cumulative</span>
-                        <span className="text-xs sm:text-2xl font-black text-amber-800">
+                      <div className="mt-1.5 sm:mt-4 pt-1.5 sm:pt-3 border-t border-amber-100 dark:border-amber-950/60 flex items-center justify-center sm:justify-between">
+                        <span className="hidden sm:inline text-xs text-amber-900 dark:text-amber-300 font-bold">Cumulative</span>
+                        <span className="text-xs sm:text-2xl font-black text-amber-800 dark:text-amber-300">
                           {formatScore(student?.overallScore ?? student?.spr)} pts
                         </span>
                       </div>
@@ -815,10 +874,10 @@ export default function PublicHomePage() {
                       onClick={() => handleStudentClick(student?.studentId)}
                       className={`cursor-pointer rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 border-2 transition-all duration-300 text-center relative order-3 group animate-slide-right delay-200 hover:-translate-y-1 ${
                         isGold
-                          ? 'bg-gradient-to-b from-amber-50/95 via-white to-white border-amber-400 shadow-xl hover:shadow-2xl hover:border-amber-500'
+                          ? 'bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500'
                           : isSilver
-                          ? 'bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-slate-400'
-                          : 'bg-white border-amber-200 shadow-lg hover:shadow-xl hover:border-amber-300'
+                          ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl hover:border-slate-400 dark:hover:border-slate-700'
+                          : 'bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-900/60 shadow-lg hover:shadow-xl hover:border-amber-300 dark:hover:border-amber-800'
                       }`}
                     >
                       <div className="flex justify-center mb-1.5 sm:mb-2">
@@ -826,39 +885,41 @@ export default function PublicHomePage() {
                           photoUrl={student?.photoUrl}
                           name={student?.studentName || student?.name || 'Student'}
                           size="lg"
-                          className={`w-11 h-11 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`}
+                          className={`w-11 h-11 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40' : ''}`}
                         />
                       </div>
                       <div
                         className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
                           isGold
-                            ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
                             : isSilver
-                            ? 'bg-slate-100/90 text-slate-700 border-slate-200'
-                            : 'bg-amber-100/90 text-amber-800 border-amber-200'
+                            ? 'bg-slate-100/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                            : 'bg-amber-100/90 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                         }`}
                       >
                         ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
                       </div>
                       <h4
                         className={`text-[10px] sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
-                          isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
+                          isGold
+                            ? 'text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-400'
+                            : 'text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'
                         }`}
                       >
                         {student?.studentName || student?.name}
                       </h4>
-                      <div className="text-[9px] sm:text-xs text-slate-500 font-medium mt-0.5">
+                      <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                         Std {formatClassNumber(student?.className)}
                       </div>
                       <div
                         className={`mt-1.5 sm:mt-4 pt-1.5 sm:pt-3 border-t flex items-center justify-center sm:justify-between ${
-                          isGold ? 'border-amber-100' : 'border-slate-100'
+                          isGold ? 'border-amber-100 dark:border-amber-950/60' : 'border-slate-100 dark:border-slate-800'
                         }`}
                       >
-                        <span className={`hidden sm:inline text-xs ${isGold ? 'text-amber-900 font-bold' : 'text-slate-400 font-medium'}`}>
+                        <span className={`hidden sm:inline text-xs ${isGold ? 'text-amber-900 dark:text-amber-300 font-bold' : 'text-slate-400 dark:text-slate-500 font-medium'}`}>
                           {isGold ? 'Cumulative' : 'Overall'}
                         </span>
-                        <span className={`text-[11px] sm:text-lg font-black ${isGold ? 'text-amber-800' : 'text-slate-800'}`}>
+                        <span className={`text-[11px] sm:text-lg font-black ${isGold ? 'text-amber-800 dark:text-amber-300' : 'text-slate-800 dark:text-slate-100'}`}>
                           {formatScore(student?.overallScore ?? student?.spr)} pts
                         </span>
                       </div>
@@ -872,8 +933,8 @@ export default function PublicHomePage() {
                 const rank1Students = leaderboard.filter((s) => s.rank === 1);
                 if (rank1Students.length <= 1) return null;
                 return (
-                  <div className="mt-4 p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl max-w-4xl mx-auto text-center shadow-xs animate-fade-in">
-                    <div className="text-xs font-black text-amber-950 flex items-center justify-center space-x-1.5">
+                  <div className="mt-4 p-3.5 bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/90 dark:border-amber-900/50 rounded-2xl max-w-4xl mx-auto text-center shadow-xs animate-fade-in">
+                    <div className="text-xs font-black text-amber-950 dark:text-amber-200 flex items-center justify-center space-x-1.5">
                       <span>🏆</span>
                       <span>{rank1Students.length} Students Jointly Share 1st Rank ({formatScore(rank1Students[0]?.spr ?? 0)} SPR Points)</span>
                     </div>
@@ -882,11 +943,11 @@ export default function PublicHomePage() {
                         <button
                           key={st.studentId}
                           onClick={() => handleStudentClick(st.studentId)}
-                          className="inline-flex items-center space-x-1.5 px-3 py-1 bg-white border border-amber-300 rounded-full text-xs font-bold text-slate-800 hover:bg-amber-100/80 shadow-2xs transition"
+                          className="inline-flex items-center space-x-1.5 px-3 py-1 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800/80 rounded-full text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-amber-100/80 dark:hover:bg-slate-800 shadow-2xs transition"
                         >
                           <span className="w-2 h-2 rounded-full bg-amber-500" />
                           <span>{st.studentName || st.name}</span>
-                          <span className="text-[10px] text-amber-800 font-semibold">Std {formatClassNumber(st.className)}</span>
+                          <span className="text-[10px] text-amber-800 dark:text-amber-300 font-semibold">Std {formatClassNumber(st.className)}</span>
                         </button>
                       ))}
                     </div>
@@ -902,20 +963,20 @@ export default function PublicHomePage() {
       <section id="leaderboard-section" className="py-6 sm:py-8 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-4 animate-slide-up delay-250 print:hidden">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-100 text-blue-900 border border-blue-200">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               Live Standings Overview
             </span>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
               Top Institutional Performers
             </h3>
-            <p className="text-[11px] sm:text-xs text-slate-500">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
               Institution-wide overall SPR benchmarks.
             </p>
           </div>
 
           <Link
             href="/leaderboard"
-            className="inline-flex items-center justify-center space-x-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl transition btn-interactive"
+            className="inline-flex items-center justify-center space-x-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3.5 py-2 rounded-xl transition btn-interactive"
           >
             <span>Full Standings Page</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -923,7 +984,7 @@ export default function PublicHomePage() {
         </div>
 
         {/* Filter Toolbar (Search & Class Filter Only) */}
-        <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-2.5 relative z-30">
+        <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-2.5 relative z-30">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
             <input
@@ -931,7 +992,7 @@ export default function PublicHomePage() {
               value={tableSearch}
               onChange={(e) => setTableSearch(e.target.value)}
               placeholder="Search by student name..."
-              className="w-full pl-8 pr-3 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+              className="w-full pl-8 pr-3 py-1.5 sm:py-2 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-600 font-medium"
             />
           </div>
 
@@ -952,10 +1013,10 @@ export default function PublicHomePage() {
         </div>
 
         {/* Overview Leaderboard Table (No Horizontal Dragging on Mobile) */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden w-full">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden w-full">
           <div className="w-full">
             <table className="w-full table-fixed text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
+              <thead className="bg-slate-50 dark:bg-slate-850 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                 <tr>
                   <th className="py-2.5 sm:py-3.5 px-2 sm:px-4 w-9 sm:w-16 text-center">#</th>
                   <th className="py-2.5 sm:py-3.5 px-2 sm:px-4">Student</th>
@@ -964,7 +1025,7 @@ export default function PublicHomePage() {
                   <th className="py-2.5 sm:py-3.5 px-1 sm:px-3 w-8 sm:w-12 text-center" title="Report issue"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
                 {loadingLeaderboard ? (
                   <tr>
                     <td colSpan={5} className="py-10 text-center">
@@ -973,7 +1034,7 @@ export default function PublicHomePage() {
                   </tr>
                 ) : displayedLeaderboard.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-500">
+                    <td colSpan={5} className="py-8 text-center text-slate-500 dark:text-slate-400">
                       No student records found matching the active filters.
                     </td>
                   </tr>
@@ -984,7 +1045,6 @@ export default function PublicHomePage() {
                     const isTop3 = row.rank === 3;
                     const studentDisplayName = row.studentName || row.name || 'Student';
                     const studentSprScore = formatScore(row.overallScore ?? row.spr);
-                    const numericScore = parseFloat(studentSprScore);
                     const classNum = formatClassNumber(row.className);
 
                     return (
@@ -992,8 +1052,8 @@ export default function PublicHomePage() {
                         key={row.studentId}
                         onClick={() => handleStudentClick(row.studentId)}
                         style={{ animationDelay: `${Math.min(idx * 20, 350)}ms` }}
-                        className={`animate-row hover:bg-blue-50/50 cursor-pointer transition-all duration-200 group ${
-                          isTop1 ? 'bg-amber-50/20' : ''
+                        className={`animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
+                          isTop1 ? 'bg-amber-50/20 dark:bg-amber-950/10' : ''
                         }`}
                         title="Click to view full student profile and score origin breakdown"
                       >
@@ -1003,41 +1063,41 @@ export default function PublicHomePage() {
                               1
                             </span>
                           ) : isTop2 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-300 text-slate-800 font-bold text-[10px] sm:text-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-[10px] sm:text-xs">
                               2
                             </span>
                           ) : isTop3 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] sm:text-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-200 dark:bg-amber-700/60 text-amber-900 dark:text-amber-200 font-bold text-[10px] sm:text-xs">
                               3
                             </span>
                           ) : (
-                            <span className="text-slate-500 font-semibold text-[11px] sm:text-xs">{row.rank}</span>
+                            <span className="text-slate-500 dark:text-slate-400 font-semibold text-[11px] sm:text-xs">{row.rank}</span>
                           )}
                         </td>
 
                         <td className="py-2 sm:py-3.5 px-1.5 sm:px-4">
                           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                             <StudentAvatar photoUrl={row.photoUrl} name={studentDisplayName} size="sm" className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
-                            <span className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-[11px] sm:text-xs leading-tight line-clamp-2">
+                            <span className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-[11px] sm:text-xs leading-tight line-clamp-2">
                               {studentDisplayName}
                             </span>
                           </div>
                         </td>
 
                         {/* Class column showing NUMBER ONLY (e.g., "8", "9", "10") */}
-                        <td className="py-2 sm:py-3.5 px-1 sm:px-4 text-center font-bold text-slate-800">
-                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[10px] sm:text-xs font-black">
+                        <td className="py-2 sm:py-3.5 px-1 sm:px-4 text-center font-bold text-slate-800 dark:text-slate-200">
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] sm:text-xs font-black">
                             {classNum}
                           </span>
                         </td>
 
                         <td className="py-2 sm:py-3.5 px-2 sm:px-4 text-right whitespace-nowrap">
-                          <div className="inline-flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl font-mono text-xs font-black shadow-2xs border transition-all group-hover:scale-105 bg-white border-slate-200">
-                            <span className={isTop1 ? 'text-amber-800 font-black' : isTop2 ? 'text-slate-800 font-black' : isTop3 ? 'text-amber-900 font-black' : 'text-blue-900 font-extrabold'}>
+                          <div className="inline-flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl font-mono text-xs font-black shadow-2xs border transition-all group-hover:scale-105 bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700">
+                            <span className={isTop1 ? 'text-amber-800 dark:text-amber-300 font-black' : isTop2 ? 'text-slate-800 dark:text-slate-200 font-black' : isTop3 ? 'text-amber-900 dark:text-amber-300 font-black' : 'text-blue-900 dark:text-blue-300 font-extrabold'}>
                               {studentSprScore}
                             </span>
                             <span className={`text-[8.5px] sm:text-[9.5px] font-black uppercase px-1 py-0.2 rounded ${
-                              isTop1 ? 'bg-amber-400 text-amber-950' : isTop2 ? 'bg-slate-300 text-slate-800' : isTop3 ? 'bg-amber-300 text-amber-950' : 'bg-blue-100 text-blue-800'
+                              isTop1 ? 'bg-amber-400 dark:bg-amber-500 text-amber-950' : isTop2 ? 'bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200' : isTop3 ? 'bg-amber-300 dark:bg-amber-600 text-amber-950' : 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300'
                             }`}>
                               PTS
                             </span>
@@ -1048,7 +1108,7 @@ export default function PublicHomePage() {
                         <td className="py-2 sm:py-3.5 px-1 sm:px-3 text-center">
                           <button
                             onClick={(e) => openReportModal(e, row)}
-                            className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded transition"
+                            className="p-1 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition"
                             title="Report inaccuracy to administration"
                           >
                             <Flag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -1063,7 +1123,7 @@ export default function PublicHomePage() {
           </div>
 
           {/* View Full Leaderboard (Opens full leaderboard in SAME tab) */}
-          <div className="p-3 bg-slate-50/90 border-t border-slate-200 text-center">
+          <div className="p-3 bg-slate-50/90 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 text-center">
             <Link
               href="/leaderboard"
               className="inline-flex items-center justify-center space-x-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition-all duration-200 hover:scale-105 active:scale-95 btn-interactive w-full sm:w-auto"
@@ -1079,21 +1139,21 @@ export default function PublicHomePage() {
       <section id="updates-section" className="py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6 print:hidden">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300 flex items-center space-x-1.5 w-fit">
-              <Megaphone className="w-3.5 h-3.5 text-amber-600" />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center space-x-1.5 w-fit">
+              <Megaphone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               <span>Broadcasts & Circulars</span>
             </span>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
               Latest Updates & Announcements
             </h3>
-            <p className="text-[11px] sm:text-xs text-slate-500">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
               Official bulletins, literary festival circulars, and assessment updates from Madin Excellence.
             </p>
           </div>
 
           <Link
             href="/updates"
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-3.5 py-2 rounded-xl transition border border-amber-200 shadow-2xs btn-interactive w-fit"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-3.5 py-2 rounded-xl transition border border-amber-200 dark:border-amber-800 shadow-2xs btn-interactive w-fit"
           >
             <span>More Updates ({newsUpdates.length > 0 ? 'All' : '0'})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1106,11 +1166,11 @@ export default function PublicHomePage() {
               <div
                 key={item.id}
                 onClick={() => setSelectedNews(item)}
-                className="group cursor-pointer bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 hover:border-amber-400 p-3 sm:p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-3 relative overflow-hidden"
+                className="group cursor-pointer bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500/80 p-3 sm:p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-3 relative overflow-hidden"
               >
                 <div className="space-y-2.5">
                   {item.imageUrl ? (
-                    <div className="relative w-full h-40 sm:h-48 rounded-xl sm:rounded-2xl bg-slate-100 overflow-hidden border border-slate-200">
+                    <div className="relative w-full h-40 sm:h-48 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700">
                       <Image
                         src={item.imageUrl}
                         alt={item.title}
@@ -1120,13 +1180,13 @@ export default function PublicHomePage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800">
                       <Megaphone className="w-6 h-6" />
                     </div>
                   )}
 
-                  <div className="flex items-center space-x-1.5 text-[10px] sm:text-xs text-slate-400 font-medium">
-                    <Calendar className="w-3 h-3 text-amber-600 shrink-0" />
+                  <div className="flex items-center space-x-1.5 text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium">
+                    <Calendar className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
                     <span>
                       {new Date(item.publishedAt).toLocaleDateString('en-US', {
                         month: 'short',
@@ -1136,20 +1196,20 @@ export default function PublicHomePage() {
                     </span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-amber-700 transition leading-snug">
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition leading-snug">
                     {item.title}
                   </h4>
 
                   {item.subtitle && (
-                    <p className="text-xs sm:text-sm text-blue-700 font-semibold leading-relaxed">
+                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
                       {item.subtitle}
                     </p>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-700 group-hover:text-amber-800">
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-amber-700 dark:text-amber-400 group-hover:text-amber-800 dark:group-hover:text-amber-300">
                   <span className="group-hover:underline">Read Full</span>
-                  <div className="w-7 h-7 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition">
+                  <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/60 flex items-center justify-center transition">
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
                   </div>
                 </div>
@@ -1157,7 +1217,7 @@ export default function PublicHomePage() {
             ))}
           </div>
         ) : (
-          <div className="p-6 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
+          <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
             No announcements posted at this time.
           </div>
         )}
@@ -1177,10 +1237,10 @@ export default function PublicHomePage() {
       {/* Individual Student Status Dossier Modal */}
       {selectedStudentId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-sm overflow-y-auto animate-fade-in print:hidden">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative my-8 max-h-[90vh] overflow-y-auto animate-zoom-up">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative my-8 max-h-[90vh] overflow-y-auto animate-zoom-up">
             <button
               onClick={closeStudentDossier}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition"
+              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1192,7 +1252,7 @@ export default function PublicHomePage() {
             ) : (
               <div className="space-y-6">
                 {/* Header Profile Card */}
-                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 pb-6 border-b border-slate-100">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 pb-6 border-b border-slate-100 dark:border-slate-800">
                   <StudentAvatar
                     photoUrl={studentProfile.student?.photoUrl}
                     name={studentProfile.student?.fullName || 'Student'}
@@ -1201,20 +1261,20 @@ export default function PublicHomePage() {
 
                   <div className="text-center sm:text-left flex-1">
                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 pb-0.5">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-50 text-blue-900 border border-blue-200">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-50 dark:bg-blue-950/70 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                         SPR ID: {studentProfile.student?.sprStudentId || studentProfile.student?.studentId}
                       </span>
-                      <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-200">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         <span>Verified Academic Profile</span>
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-black text-slate-900 mt-1">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1">
                       {studentProfile.student?.fullName}
                     </h3>
-                    <div className="text-xs text-slate-600 font-medium mt-0.5">
-                      Standard: <span className="font-bold text-slate-900">{formatClassNumber(studentProfile.student?.class?.name)}</span> {studentProfile.student?.division ? `(Division ${studentProfile.student?.division})` : ''}
+                    <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+                      Standard: <span className="font-bold text-slate-900 dark:text-white">{formatClassNumber(studentProfile.student?.class?.name)}</span> {studentProfile.student?.division ? `(Division ${studentProfile.student?.division})` : ''}
                     </div>
                   </div>
 
@@ -1232,16 +1292,16 @@ export default function PublicHomePage() {
 
                 {/* Rank Stats Grid */}
                 <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium">Class Rank</div>
-                    <div className="text-base font-black text-slate-900 mt-0.5">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Class Rank</div>
+                    <div className="text-base font-black text-slate-900 dark:text-white mt-0.5">
                       #{studentProfile.classRank || 1}{' '}
-                      <span className="text-[10px] text-slate-400 font-normal">/ {studentProfile.totalStudentsInClass || 1}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">/ {studentProfile.totalStudentsInClass || 1}</span>
                     </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium">Total SPR Points</div>
-                    <div className="text-base font-black text-blue-600 mt-0.5 font-mono">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total SPR Points</div>
+                    <div className="text-base font-black text-blue-600 dark:text-blue-400 mt-0.5 font-mono">
                       {formatScore(studentProfile.overallScore ?? studentProfile.overallSPR)} pts
                     </div>
                   </div>
@@ -1249,15 +1309,15 @@ export default function PublicHomePage() {
 
                 {/* Interactive Calculation Breakdown View Switcher */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <div className="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-slate-800">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       Performance & Points Breakdown
                     </h4>
-                    <div className="flex items-center space-x-1 p-0.5 rounded-lg bg-slate-100 text-[10px] font-bold">
+                    <div className="flex items-center space-x-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold">
                       <button
                         onClick={() => setModalCalcTab('OVERALL')}
                         className={`px-2 py-1 rounded-md transition ${
-                          modalCalcTab === 'OVERALL' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                          modalCalcTab === 'OVERALL' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         SPR Points
@@ -1265,7 +1325,7 @@ export default function PublicHomePage() {
                       <button
                         onClick={() => setModalCalcTab('SUBJECTS')}
                         className={`px-2 py-1 rounded-md transition ${
-                          modalCalcTab === 'SUBJECTS' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                          modalCalcTab === 'SUBJECTS' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Academic Marks
@@ -1273,7 +1333,7 @@ export default function PublicHomePage() {
                       <button
                         onClick={() => setModalCalcTab('PROGRAMMES')}
                         className={`px-2 py-1 rounded-md transition ${
-                          modalCalcTab === 'PROGRAMMES' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                          modalCalcTab === 'PROGRAMMES' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Competitions
@@ -1288,15 +1348,15 @@ export default function PublicHomePage() {
                         {(studentProfile.categoryBreakdown || studentProfile.categoryScores || []).map((cat: any) => {
                           const pts = cat.earnedPoints ?? 0;
                           return (
-                            <div key={cat.categoryId} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs">
+                            <div key={cat.categoryId} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 flex items-center justify-between text-xs">
                               <div className="space-y-0.5">
-                                <span className="font-bold text-slate-900">{cat.categoryName}</span>
-                                <div className="text-[10px] text-slate-400">
+                                <span className="font-bold text-slate-900 dark:text-white">{cat.categoryName}</span>
+                                <div className="text-[10px] text-slate-400 dark:text-slate-500">
                                   {cat.recordsCount || 0} valid record(s)
                                 </div>
                               </div>
                               <div className="text-right">
-                                <span className="font-mono font-extrabold text-blue-700 text-sm">
+                                <span className="font-mono font-extrabold text-blue-700 dark:text-blue-400 text-sm">
                                   +{typeof pts === 'number' ? pts.toLocaleString('en-US') : pts} pts
                                 </span>
                               </div>
@@ -1312,28 +1372,28 @@ export default function PublicHomePage() {
                     <div className="space-y-2.5 animate-fade-in max-h-64 overflow-y-auto pr-1">
                       {studentProfile.subjectWiseRecords && studentProfile.subjectWiseRecords.length > 0 ? (
                         studentProfile.subjectWiseRecords.map((r: any, idx: number) => (
-                          <div key={r.id || idx} className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-slate-100/70 transition">
+                          <div key={r.id || idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs hover:bg-slate-100/70 dark:hover:bg-slate-700/60 transition">
                             <div className="space-y-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="font-bold text-slate-900 text-xs sm:text-sm">{r.subjectName}</span>
-                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200">
+                                <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{r.subjectName}</span>
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                                   Category: {r.categoryName}
                                 </span>
                               </div>
-                              <div className="text-[11px] text-slate-500 font-medium">
-                                Assessment: <span className="font-semibold text-slate-700">{r.examName || r.termName || 'Assessment'}</span>
-                                {r.institutionName && <span className="ml-1.5 text-blue-700">• {r.institutionName}</span>}
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                Assessment: <span className="font-semibold text-slate-700 dark:text-slate-300">{r.examName || r.termName || 'Assessment'}</span>
+                                {r.institutionName && <span className="ml-1.5 text-blue-700 dark:text-blue-400">• {r.institutionName}</span>}
                               </div>
                             </div>
                             <div className="text-right shrink-0 ml-3">
-                              <div className="font-mono font-extrabold text-blue-700 text-sm sm:text-base">
+                              <div className="font-mono font-extrabold text-blue-700 dark:text-blue-400 text-sm sm:text-base">
                                 {r.percentage.toFixed(1)}%
                               </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <div className="py-6 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
+                        <div className="py-6 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                           No direct subject exam records found. Academic evaluations are normalized into Islamic and School percentages.
                         </div>
                       )}
@@ -1345,29 +1405,29 @@ export default function PublicHomePage() {
                     <div className="space-y-2.5 animate-fade-in max-h-64 overflow-y-auto pr-1">
                       {studentProfile.programmeWiseRecords && studentProfile.programmeWiseRecords.length > 0 ? (
                         studentProfile.programmeWiseRecords.map((r: any, idx: number) => (
-                          <div key={r.id || idx} className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-slate-100/70 transition">
+                          <div key={r.id || idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs hover:bg-slate-100/70 dark:hover:bg-slate-700/60 transition">
                             <div className="space-y-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="font-bold text-slate-900 text-xs sm:text-sm">{r.competitionName}</span>
-                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
+                                <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{r.competitionName}</span>
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-900 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                                   Category: {r.categoryName}
                                 </span>
                               </div>
-                              <div className="text-[11px] text-slate-500 font-medium">
-                                Fest / Program: <span className="font-semibold text-slate-700">{r.festName}</span>
-                                <span className="ml-1.5 text-slate-400">• Level: <span className="font-semibold text-slate-700">{r.levelName}</span></span>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                Fest / Program: <span className="font-semibold text-slate-700 dark:text-slate-300">{r.festName}</span>
+                                <span className="ml-1.5 text-slate-400">• Level: <span className="font-semibold text-slate-700 dark:text-slate-300">{r.levelName}</span></span>
                               </div>
-                              {r.remarks && <div className="text-[10px] text-emerald-700 italic">{r.remarks}</div>}
+                              {r.remarks && <div className="text-[10px] text-emerald-700 dark:text-emerald-400 italic">{r.remarks}</div>}
                             </div>
                             <div className="text-right shrink-0 ml-3">
-                              <div className="font-mono font-extrabold text-purple-700 text-sm sm:text-base">
+                              <div className="font-mono font-extrabold text-purple-700 dark:text-purple-400 text-sm sm:text-base">
                                 {r.percentage.toFixed(1)}%
                               </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <div className="py-6 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
+                        <div className="py-6 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                           No direct festival records found. Literary & Program scores are aggregated in the overall SPR registry.
                         </div>
                       )}
@@ -1378,22 +1438,22 @@ export default function PublicHomePage() {
                 {/* Creative Hub Works */}
                 {studentProfile.creativeWorks && studentProfile.creativeWorks.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                       Creative Hub Submissions ({studentProfile.creativeWorks.length})
                     </h4>
                     <div className="space-y-1.5">
                       {studentProfile.creativeWorks.map((work: any) => (
-                        <div key={work.id} className="p-3 rounded-xl bg-purple-50/50 border border-purple-100 flex items-center justify-between text-xs">
+                        <div key={work.id} className="p-3 rounded-xl bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 flex items-center justify-between text-xs">
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <span className="font-bold text-slate-900">{work.title}</span>
-                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
+                              <span className="font-bold text-slate-900 dark:text-white">{work.title}</span>
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-900 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                                 Category: Creative Hub ({work.category?.name || 'Literary'})
                               </span>
                             </div>
-                            {work.content && <div className="text-[10px] text-slate-500 line-clamp-1">{work.content}</div>}
+                            {work.content && <div className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{work.content}</div>}
                           </div>
-                          <span className="font-bold text-purple-900 text-sm">{work.percentage ? `${work.percentage.toFixed(1)}%` : '100.0%'}</span>
+                          <span className="font-bold text-purple-900 dark:text-purple-300 text-sm">{work.percentage ? `${work.percentage.toFixed(1)}%` : '100.0%'}</span>
                         </div>
                       ))}
                     </div>
@@ -1401,10 +1461,10 @@ export default function PublicHomePage() {
                 )}
 
                 {/* Modal Footer Actions (In SAME Tab) */}
-                <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
                   <button
                     onClick={(e) => openReportModal(e, studentProfile)}
-                    className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-bold transition"
+                    className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 dark:text-slate-300 hover:text-rose-700 dark:hover:text-rose-400 text-xs font-bold transition"
                   >
                     <Flag className="w-3.5 h-3.5" />
                     <span>Report Discrepancy</span>

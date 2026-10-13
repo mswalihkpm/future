@@ -48,17 +48,17 @@ function PublicMobileNavContent() {
   return (
     <nav
       id="public-mobile-nav"
-      className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl flex items-center justify-around py-1.5 px-1 print:hidden"
+      className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl flex items-center justify-around py-1.5 px-1 print:hidden"
     >
       {/* 1. Home */}
       <Link
         href="/"
         className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors relative ${
-          isHome ? 'text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-900'
+          isHome ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
         }`}
       >
-        {isHome && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 rounded-full" />}
-        <Home className={`w-5 h-5 mb-0.5 ${isHome ? 'text-blue-600' : 'text-slate-500'}`} />
+        {isHome && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />}
+        <Home className={`w-5 h-5 mb-0.5 ${isHome ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`} />
         <span className="text-[10px]">Home</span>
       </Link>
 
@@ -66,11 +66,11 @@ function PublicMobileNavContent() {
       <Link
         href="/leaderboard"
         className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors relative ${
-          isLeaderboard ? 'text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-900'
+          isLeaderboard ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
         }`}
       >
-        {isLeaderboard && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 rounded-full" />}
-        <Trophy className={`w-5 h-5 mb-0.5 ${isLeaderboard ? 'text-blue-600' : 'text-slate-500'}`} />
+        {isLeaderboard && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />}
+        <Trophy className={`w-5 h-5 mb-0.5 ${isLeaderboard ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`} />
         <span className="text-[10px]">Leaderboard</span>
       </Link>
 
@@ -78,11 +78,11 @@ function PublicMobileNavContent() {
       <Link
         href="/categories"
         className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors relative ${
-          isCategories ? 'text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-900'
+          isCategories ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
         }`}
       >
-        {isCategories && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 rounded-full" />}
-        <Layers className={`w-5 h-5 mb-0.5 ${isCategories ? 'text-blue-600' : 'text-slate-500'}`} />
+        {isCategories && <span className="absolute -top-1.5 w-6 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />}
+        <Layers className={`w-5 h-5 mb-0.5 ${isCategories ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`} />
         <span className="text-[10px]">Categories</span>
       </Link>
 
@@ -90,11 +90,11 @@ function PublicMobileNavContent() {
       <Link
         href="/updates"
         className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors relative ${
-          isUpdates ? 'text-amber-600 font-bold' : 'text-slate-500 hover:text-amber-600'
+          isUpdates ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400'
         }`}
       >
-        {isUpdates && <span className="absolute -top-1.5 w-6 h-0.5 bg-amber-600 rounded-full" />}
-        <Megaphone className={`w-5 h-5 mb-0.5 ${isUpdates ? 'text-amber-600' : 'text-slate-500'}`} />
+        {isUpdates && <span className="absolute -top-1.5 w-6 h-0.5 bg-amber-600 dark:bg-amber-400 rounded-full" />}
+        <Megaphone className={`w-5 h-5 mb-0.5 ${isUpdates ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'}`} />
         <span className="text-[10px]">Updates</span>
       </Link>
     </nav>

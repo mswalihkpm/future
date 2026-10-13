@@ -17,11 +17,16 @@
 }
 
 .dark {
-  --primary-navy: #0A2540;
-  --background: #0B132B;
+  --primary-navy: #0F172A;
+  --primary-navy-dark: #020617;
+  --accent-gold: #F59E0B;
+  --accent-gold-hover: #D97706;
+  --accent-blue: #3B82F6;
+  --background: #080E1E;
   --foreground: #F8FAFC;
-  --card-bg: #111D4A;
+  --card-bg: #0F1A2E;
   --border-color: #1E293B;
+  color-scheme: dark;
 }
 
 * {

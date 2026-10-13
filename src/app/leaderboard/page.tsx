@@ -855,9 +855,9 @@ function deriveCategoryLeaderboard(
   const isLibraryActive = currentCategory?.code === 'LIBRARY';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300">
       {/* Top Header with Low Opacity, Blur & Clean Navigation */}
-      <header className="sticky top-0 z-40 bg-white/20 backdrop-blur-md border-b border-white/30 shadow-xs py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8 animate-slide-down print:hidden">
+      <header className="sticky top-0 z-40 bg-white/20 dark:bg-slate-950/45 backdrop-blur-md border-b border-white/30 dark:border-slate-800/40 shadow-xs py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8 animate-slide-down print:hidden">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
@@ -873,17 +873,17 @@ function deriveCategoryLeaderboard(
             <div>
               {/* Desktop Branding */}
               <div className="hidden sm:block">
-                <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-blue-600">
+                <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
                   Madin School of Excellence
                 </div>
-                <h1 className="text-sm sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+                <h1 className="text-sm sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                   STUDENTS PERFORMANCE RATE (SPR)
                 </h1>
               </div>
 
               {/* Clean Mobile Branding */}
               <div className="sm:hidden flex flex-col">
-                <div className="text-[11px] font-black tracking-tight text-slate-900 uppercase leading-none">
+                <div className="text-[11px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
                   MADIN EXCELLENCE
                 </div>
                 <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
@@ -896,7 +896,7 @@ function deriveCategoryLeaderboard(
           <div className="flex items-center space-x-2">
             <Link
               href="/"
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition btn-interactive"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition btn-interactive"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Overview</span>
@@ -910,14 +910,14 @@ function deriveCategoryLeaderboard(
         {/* Dedicated Separate Leaderboards Switcher Navigation Bar */}
         <div className="space-y-2 animate-slide-up">
           {/* Level 1: Primary Category / Wing Tabs */}
-          <div className="bg-white p-1.5 sm:p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar">
+          <div className="bg-white dark:bg-slate-900 p-1.5 sm:p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar">
             {/* Overall SPR */}
             <button
               onClick={() => switchLeaderboard({ type: 'OVERALL' })}
               className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-150 shrink-0 flex items-center space-x-1.5 ${
                 isOverallActive
                   ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20 ring-2 ring-blue-600/30'
-                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80'
+                  : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700'
               }`}
             >
               <Trophy className={`w-3.5 h-3.5 ${isOverallActive ? 'text-amber-300' : 'text-amber-500'}`} />
@@ -1469,7 +1469,7 @@ function deriveCategoryLeaderboard(
         )}
 
         {/* Filter bar */}
-        <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 animate-slide-up delay-200 relative z-30">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 animate-slide-up delay-200 relative z-30">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
             <input
@@ -1477,7 +1477,7 @@ function deriveCategoryLeaderboard(
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search ranked students by name..."
-              className="w-full pl-8 pr-3 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+              className="w-full pl-8 pr-3 py-1.5 sm:py-2 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-600 font-medium"
             />
           </div>
 
@@ -1498,10 +1498,10 @@ function deriveCategoryLeaderboard(
         </div>
 
         {/* Full Main Leaderboard Table (Click row to open complete % calculation modal) */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden w-full animate-slide-up delay-250">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden w-full animate-slide-up delay-250">
           <div className="w-full">
             <table className="w-full table-fixed text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
+              <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                 <tr>
                   <th className="py-2.5 sm:py-3.5 px-2 sm:px-4 w-9 sm:w-16 text-center">Rank</th>
                   <th className="py-2.5 sm:py-3.5 px-2 sm:px-4">Student</th>
@@ -1510,7 +1510,7 @@ function deriveCategoryLeaderboard(
                   <th className="py-2.5 sm:py-3.5 px-1 sm:px-3 w-8 sm:w-12 text-center" title="Report inaccuracy"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-sans">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 font-sans">
                 {loading ? (
                   <tr>
                     <td colSpan={5} className="py-10 text-center">
@@ -1519,7 +1519,7 @@ function deriveCategoryLeaderboard(
                   </tr>
                 ) : filteredEntries.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-10 text-center text-slate-500">
+                    <td colSpan={5} className="py-10 text-center text-slate-500 dark:text-slate-400">
                       No ranked student records found matching the active filters.
                     </td>
                   </tr>
@@ -1530,7 +1530,6 @@ function deriveCategoryLeaderboard(
                     const isTop3 = st.rank === 3;
                     const studentDisplayName = st.name || st.studentName || 'Student';
                     const sprScore = formatScore(st.spr ?? st.overallScore);
-                    const numericScore = parseFloat(sprScore);
                     const classNum = formatClassNumber(st.className);
 
                     return (
@@ -1538,8 +1537,8 @@ function deriveCategoryLeaderboard(
                         key={st.studentId}
                         onClick={() => handleStudentRowClick(st.studentId)}
                         style={{ animationDelay: `${Math.min(idx * 20, 450)}ms` }}
-                        className={`animate-row hover:bg-blue-50/50 cursor-pointer transition-all duration-200 group ${
-                          isTop1 ? 'bg-amber-50/20' : ''
+                        className={`animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
+                          isTop1 ? 'bg-amber-50/20 dark:bg-amber-950/10' : ''
                         }`}
                         title={
                           !selectedCategory && !selectedStream && !selectedFest
@@ -1553,41 +1552,41 @@ function deriveCategoryLeaderboard(
                               1
                             </span>
                           ) : isTop2 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-300 text-slate-800 font-bold text-[10px] sm:text-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-[10px] sm:text-xs">
                               2
                             </span>
                           ) : isTop3 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] sm:text-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-200 dark:bg-amber-700/60 text-amber-900 dark:text-amber-200 font-bold text-[10px] sm:text-xs">
                               3
                             </span>
                           ) : (
-                            <span className="text-slate-500 font-semibold text-[11px] sm:text-xs">{st.rank}</span>
+                            <span className="text-slate-500 dark:text-slate-400 font-semibold text-[11px] sm:text-xs">{st.rank}</span>
                           )}
                         </td>
 
                         <td className="py-2 sm:py-3.5 px-1.5 sm:px-4">
                           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                             <StudentAvatar photoUrl={st.photoUrl} name={studentDisplayName} size="sm" className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
-                            <span className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-[11px] sm:text-xs leading-tight line-clamp-2">
+                            <span className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-[11px] sm:text-xs leading-tight line-clamp-2">
                               {studentDisplayName}
                             </span>
                           </div>
                         </td>
 
                         {/* Class column showing Number Only (e.g. "8", "9", "10") */}
-                        <td className="py-2 sm:py-3.5 px-1 sm:px-4 text-center font-bold text-slate-800">
-                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[10px] sm:text-xs font-black">
+                        <td className="py-2 sm:py-3.5 px-1 sm:px-4 text-center font-bold text-slate-800 dark:text-slate-200">
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] sm:text-xs font-black">
                             {classNum}
                           </span>
                         </td>
 
                         <td className="py-2 sm:py-3.5 px-2 sm:px-4 text-right whitespace-nowrap">
-                          <div className="inline-flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl font-mono text-xs font-black shadow-2xs border transition-all group-hover:scale-105 bg-white border-slate-200">
-                            <span className={isTop1 ? 'text-amber-800 font-black' : isTop2 ? 'text-slate-800 font-black' : isTop3 ? 'text-amber-900 font-black' : 'text-blue-900 font-extrabold'}>
+                          <div className="inline-flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl font-mono text-xs font-black shadow-2xs border transition-all group-hover:scale-105 bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700">
+                            <span className={isTop1 ? 'text-amber-800 dark:text-amber-300 font-black' : isTop2 ? 'text-slate-800 dark:text-slate-200 font-black' : isTop3 ? 'text-amber-900 dark:text-amber-300 font-black' : 'text-blue-900 dark:text-blue-300 font-extrabold'}>
                               {sprScore}
                             </span>
                             <span className={`text-[8.5px] sm:text-[9.5px] font-black uppercase px-1 py-0.2 rounded ${
-                              isTop1 ? 'bg-amber-400 text-amber-950' : isTop2 ? 'bg-slate-300 text-slate-800' : isTop3 ? 'bg-amber-300 text-amber-950' : 'bg-blue-100 text-blue-800'
+                              isTop1 ? 'bg-amber-400 dark:bg-amber-500 text-amber-950' : isTop2 ? 'bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200' : isTop3 ? 'bg-amber-300 dark:bg-amber-600 text-amber-950' : 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300'
                             }`}>
                               PTS
                             </span>
@@ -1598,7 +1597,7 @@ function deriveCategoryLeaderboard(
                         <td className="py-2 sm:py-3.5 px-1 sm:px-3 text-center">
                           <button
                             onClick={(e) => openReportModal(e, st)}
-                            className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded transition"
+                            className="p-1 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition"
                             title="Report inaccuracy to administration"
                           >
                             <Flag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -1612,7 +1611,7 @@ function deriveCategoryLeaderboard(
             </table>
           </div>
 
-          <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
             <span>Showing all {filteredEntries.length} ranked students in SPR Registry</span>
             <span>Madin School of Excellence • Official Record</span>
           </div>

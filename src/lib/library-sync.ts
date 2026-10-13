@@ -5,22 +5,72 @@ import { isValidSprId, normalizeSprId } from './spr-id';
 const LIBRARY_BASE_URL = 'https://msoelibrary.vercel.app';
 const SUPABASE_REST_URL = 'https://lezoaunsbfgrbcskedoq.supabase.co';
 
-function getPageBucket(pages: number | string | undefined | null): string {
-  const pageNum = typeof pages === 'number' ? pages : parseInt(String(pages || '0').replace(/[^\d]/g, ''), 10) || 0;
-  if (pageNum < 50) return 'b50';
-  if (pageNum < 100) return 'b100';
-  if (pageNum < 150) return 'b150';
-  if (pageNum < 200) return 'b200';
-  if (pageNum < 250) return 'b250';
-  if (pageNum <= 300) return 'b300';
-  return 'a300';
-}
+const lx = (e: any): number => {
+  if (typeof e === 'number') return Number.isFinite(e) ? e : 0;
+  const t = Number.parseInt(String(e ?? '').replace(/[^\d]/g, ''), 10);
+  return Number.isFinite(t) ? t : 0;
+};
 
-function calculateBookPoints(scoringTable: any, category: string | undefined, pages: number | string | undefined): number {
-  const catPoints = scoringTable?.[category || 'Others'] || scoringTable?.Others || {};
-  const bucket = getPageBucket(pages);
-  return catPoints[bucket] ?? 0;
-}
+const K0 = (pages: number, rate: number): number =>
+  Math.round(((pages / 10) * rate + Number.EPSILON) * 1e6) / 1e6;
+
+const cx = (points: number): number =>
+  Math.round((points + Number.EPSILON) * 1e6) / 1e6;
+
+const r5 = (rateList: any[], category: string | undefined, date: Date = new Date()): any => {
+  const findCat = (catName: string) =>
+    rateList
+      .filter((a) => a.category === catName && new Date(a.effective_from || a.effectiveFrom).getTime() <= date.getTime())
+      .sort((a, b) => new Date(b.effective_from || b.effectiveFrom).getTime() - new Date(a.effective_from || a.effectiveFrom).getTime())[0];
+  return findCat(category || 'Others') ?? findCat('Others');
+};
+
+const n5 = (rec: any): string => {
+  if (rec.return_option) return rec.return_option;
+  if (rec.read_status === 'full_read') return 'full_read';
+  if (rec.read_status === 'half_read') {
+    return rec.pages_read && rec.pages_read > 0 ? 'custom_page' : 'half_read';
+  }
+  return 'not_read';
+};
+
+const ny = (rec: any, book: any, rateList: any[]): { value: number; versionId?: string } => {
+  if (rec.rate_used !== undefined && rec.rate_used !== null && rec.rate_version_id) {
+    return { value: Number(rec.rate_used), versionId: rec.rate_version_id };
+  }
+  const matched = r5(rateList, book?.category);
+  return {
+    value: Number(matched?.points_per_10_pages ?? matched?.pointsPer10Pages ?? 0),
+    versionId: matched?.id,
+  };
+};
+
+const i5 = (book: any, opt: string, pagesRead: any, rateObj: { value: number; versionId?: string }) => {
+  const totalPages = lx(book?.pages);
+  const maxPts = K0(totalPages, rateObj.value);
+  const meta = { rateUsed: rateObj.value, rateVersionId: rateObj.versionId, maxPossiblePoints: maxPts };
+  switch (opt) {
+    case 'full_read':
+      return { ...meta, calculatedPoints: maxPts };
+    case 'half_read':
+      return { ...meta, calculatedPoints: cx(maxPts / 2) };
+    case 'custom_page': {
+      const readCount = Math.max(0, pagesRead ?? 0);
+      return { ...meta, calculatedPoints: K0(readCount, rateObj.value) };
+    }
+    default:
+      return { ...meta, calculatedPoints: 0 };
+  }
+};
+
+const YF = (rec: any, book: any, rateList: any[]): number => {
+  if (rec.calculated_points !== undefined && rec.calculated_points !== null) {
+    return Number(rec.calculated_points);
+  }
+  const opt = n5(rec);
+  if (opt === 'not_read') return 0;
+  return i5(book, opt, rec.pages_read, ny(rec, book, rateList)).calculatedPoints;
+};
 
 async function fetchAllSupabase(endpoint: string, headers: Record<string, string>): Promise<any[]> {
   let allRows: any[] = [];
@@ -89,19 +139,23 @@ export async function fetchLibraryLeaderboard(): Promise<{
   const anonKey = anonKeyMatch[0];
   const headers = { apikey: anonKey, Authorization: `Bearer ${anonKey}` };
 
-  // 2. Query settings, books (paginated), borrow records (paginated), and students (paginated)
-  const [settingsRes, booksRes, borrowRes, studentsRes] = await Promise.all([
+  // 2. Query settings, books (paginated), borrow records (paginated), students (paginated), and rate versions
+  const [settingsRes, booksRes, borrowRes, studentsRes, ratesRes] = await Promise.all([
     fetch(`${SUPABASE_REST_URL}/rest/v1/admin_settings?select=*&limit=1`, { headers, cache: 'no-store' }).then((r) => r.json()),
     fetchAllSupabase('books?select=*&order=average_rating.desc', headers),
     fetchAllSupabase('borrow_records?select=*&order=created_at.desc', headers),
     fetchAllSupabase('students?select=*&order=name.asc', headers),
+    fetchAllSupabase('reading_rate_versions?select=*&order=effective_from.desc', headers),
   ]);
 
   const settings = settingsRes?.[0] || {};
-  const scoringTable = settings.scoring_table || {};
-  const reviewPointsDefault = settings.review_points_default ?? 10;
+  const reviewPointsDefault = settings.review_points_default ?? 1;
   const booksMap = new Map<string, any>((booksRes || []).map((b: any) => [b.id, b]));
   const studentsMap = new Map<string, any>((studentsRes || []).map((s: any) => [s.id, s]));
+  const studentsByName = new Map<string, any>(
+    (studentsRes || []).map((s: any) => [(s.name || '').trim().toLowerCase(), s])
+  );
+  const ratesList = ratesRes || [];
 
   // 3. Compute exact Leaderboard scores identical to MSOE Library
   const studentMap = new Map<string, any>();
@@ -110,16 +164,20 @@ export async function fetchLibraryLeaderboard(): Promise<{
     const borrowerName = (rec.borrower_name || '').trim();
     if (!borrowerName) continue;
 
-    const studentObj = rec.student_id ? studentsMap.get(rec.student_id) : null;
+    let studentObj = rec.student_id ? studentsMap.get(rec.student_id) : null;
+    if (!studentObj) {
+      studentObj = studentsByName.get(borrowerName.toLowerCase()) || null;
+    }
+
     const rawSprId = studentObj?.spr_student_id ? String(studentObj.spr_student_id).trim() : null;
     const sprStudentId = rawSprId && isValidSprId(rawSprId) ? normalizeSprId(rawSprId) : null;
 
-    const groupKey = rec.student_id ? `id:${rec.student_id}` : `name:${borrowerName}`;
+    const groupKey = studentObj?.id ? `id:${studentObj.id}` : `name:${borrowerName}`;
 
     const student = studentMap.get(groupKey) ?? {
-      studentId: rec.student_id || null,
-      name: borrowerName,
-      className: rec.borrower_class || studentObj?.class || '',
+      studentId: studentObj?.id || rec.student_id || null,
+      name: studentObj?.name || borrowerName,
+      className: studentObj?.class || rec.borrower_class || '',
       sprStudentId: sprStudentId,
       points: 0,
       fullRead: 0,
@@ -131,19 +189,23 @@ export async function fetchLibraryLeaderboard(): Promise<{
       student.sprStudentId = sprStudentId;
     }
 
-    if (!student.className && (rec.borrower_class || studentObj?.class)) {
-      student.className = rec.borrower_class || studentObj?.class || '';
+    if (!student.className && (studentObj?.class || rec.borrower_class)) {
+      student.className = studentObj?.class || rec.borrower_class || '';
     }
 
     const book = booksMap.get(rec.book_id);
-    const pts = calculateBookPoints(scoringTable, book?.category, book?.pages);
+    const opt = n5(rec);
 
-    if (rec.read_status === 'full_read') {
+    if (opt === 'full_read' || rec.read_status === 'full_read') {
       student.fullRead += 1;
-      student.points += pts;
-    } else if (rec.read_status === 'half_read') {
+    } else if (opt === 'half_read' || opt === 'custom_page' || rec.read_status === 'half_read') {
       student.halfRead += 1;
-      student.points += Math.round(pts / 2);
+    }
+
+    if (rec.calculated_points !== undefined && rec.calculated_points !== null) {
+      student.points += Number(rec.calculated_points);
+    } else if (ratesList.length > 0) {
+      student.points += YF(rec, book, ratesList);
     }
 
     if (rec.review_conducted) {
@@ -153,6 +215,11 @@ export async function fetchLibraryLeaderboard(): Promise<{
 
     studentMap.set(groupKey, student);
   }
+
+  // Round points cleanly to 2 decimal places to match site display
+  studentMap.forEach((student) => {
+    student.points = Number(cx(student.points).toFixed(2));
+  });
 
   // Filter only readers with points or read books (Exact Leaderboard of Library Website)
   const sortedLeaderboard = Array.from(studentMap.values())

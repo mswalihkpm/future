@@ -323,7 +323,7 @@ export default function PublicStudentScorecardPage() {
   const isExamCategory = (code?: string) => code === 'ISLAMIC' || code === 'SCHOOL';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans py-6 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 font-sans py-6 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white transition-colors duration-300">
       {/* Global CSS for Strict A4 Print Studio Styling */}
       <style jsx global>{`
         @media print {
@@ -385,7 +385,7 @@ export default function PublicStudentScorecardPage() {
         <div className="flex items-center justify-between print:hidden animate-slide-down">
           <Link
             href="/"
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs transition hover:scale-105 active:scale-95 btn-interactive"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs transition hover:scale-105 active:scale-95 btn-interactive"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Standings</span>
@@ -404,7 +404,7 @@ export default function PublicStudentScorecardPage() {
                   alert('Scorecard URL copied to clipboard!');
                 }
               }}
-              className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-700 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-50 transition hover:scale-105 active:scale-95 btn-interactive cursor-pointer"
+              className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition hover:scale-105 active:scale-95 btn-interactive cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Share</span>
@@ -423,7 +423,7 @@ export default function PublicStudentScorecardPage() {
         </div>
 
         {/* Official Scorecard Paper Container */}
-        <div className="scorecard-container bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-3 sm:p-8 space-y-2.5 sm:space-y-4 print:p-0 print:border-none print:shadow-none print:space-y-1.5 animate-zoom-up">
+        <div className="scorecard-container bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden p-3 sm:p-8 space-y-2.5 sm:space-y-4 print:p-0 print:border-none print:shadow-none print:space-y-1.5 print:bg-white animate-zoom-up">
           {/* Top Header Banner Card */}
           <div className="print-banner-section relative rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 text-white overflow-hidden p-2.5 sm:p-5 flex items-center justify-between shadow-md print:p-2.5 print:rounded-xl page-break-avoid">
             <div className="relative z-10 flex items-center space-x-2 sm:space-x-3 print:space-x-2.5">
@@ -466,7 +466,7 @@ export default function PublicStudentScorecardPage() {
           </div>
 
           {/* Student Profile Overview Card */}
-          <div className="print-banner-section bg-slate-50 rounded-xl sm:rounded-2xl p-2.5 sm:p-5 border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start space-y-2 sm:space-y-0 sm:space-x-4 print:p-2.5 print:rounded-xl print:space-x-3 page-break-avoid">
+          <div className="print-banner-section bg-slate-50 dark:bg-slate-800/60 rounded-xl sm:rounded-2xl p-2.5 sm:p-5 border border-slate-200 dark:border-slate-700/80 flex flex-col sm:flex-row items-center sm:items-start space-y-2 sm:space-y-0 sm:space-x-4 print:p-2.5 print:rounded-xl print:space-x-3 page-break-avoid">
             <StudentAvatar
               photoUrl={student?.photoUrl}
               name={student?.fullName || 'Student'}
@@ -476,22 +476,22 @@ export default function PublicStudentScorecardPage() {
 
             <div className="flex-1 text-center sm:text-left space-y-0.5 sm:space-y-1">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-1.5">
-                <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-950 border border-blue-300 text-[8.5px] sm:text-[10px] font-mono font-bold print:text-[8px] print:py-0 shadow-2xs">
+                <span className="px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/70 text-blue-950 dark:text-blue-300 border border-blue-300 dark:border-blue-800 text-[8.5px] sm:text-[10px] font-mono font-bold print:text-[8px] print:py-0 shadow-2xs">
                   {student?.sprStudentId ? `${student.sprStudentId}` : 'SPR ID'}
                 </span>
                 {student?.studentId && (
-                  <span className="px-1.5 py-0.5 rounded-md bg-slate-200/70 text-slate-800 text-[8.5px] sm:text-[10px] font-semibold print:text-[8px] print:py-0">
+                  <span className="px-1.5 py-0.5 rounded-md bg-slate-200/70 dark:bg-slate-700/70 text-slate-800 dark:text-slate-300 text-[8.5px] sm:text-[10px] font-semibold print:text-[8px] print:py-0">
                     ADM: {student.studentId}
                   </span>
                 )}
               </div>
 
-              <h2 className="text-sm sm:text-2xl font-black text-slate-900 print:text-sm leading-tight truncate">{student?.fullName}</h2>
-              <div className="text-[10px] sm:text-xs text-slate-600 font-medium print:text-[9.5px]">
-                Class: <span className="font-bold text-slate-800">{formatClassNumber(student?.class?.name) || 'N/A'}{student?.division ? ` - ${student.division}` : ''}</span> • Roll No: <span className="font-bold text-slate-800">{student?.rollNo || 'N/A'}</span>
+              <h2 className="text-sm sm:text-2xl font-black text-slate-900 dark:text-white print:text-sm leading-tight truncate">{student?.fullName}</h2>
+              <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400 font-medium print:text-[9.5px]">
+                Class: <span className="font-bold text-slate-800 dark:text-slate-200">{formatClassNumber(student?.class?.name) || 'N/A'}{student?.division ? ` - ${student.division}` : ''}</span> • Roll No: <span className="font-bold text-slate-800 dark:text-slate-200">{student?.rollNo || 'N/A'}</span>
               </div>
-              <div className="text-[10px] sm:text-xs text-slate-600 print:text-[9.5px]">
-                School: <span className="font-bold text-slate-800">{student?.school?.name || 'Main Campus'}</span>
+              <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400 print:text-[9.5px]">
+                School: <span className="font-bold text-slate-800 dark:text-slate-200">{student?.school?.name || 'Main Campus'}</span>
               </div>
             </div>
 
@@ -509,25 +509,25 @@ export default function PublicStudentScorecardPage() {
 
           {/* Ranks & Position Metrics */}
           <div className="print-ranks-section grid grid-cols-3 gap-1.5 sm:gap-3 text-center print:gap-1.5 page-break-avoid">
-            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 print:p-1.5 print:rounded-lg">
-              <div className="text-[9px] sm:text-[11px] text-slate-500 font-medium print:text-[9px]">Class Rank</div>
-              <div className="text-xs sm:text-xl font-black text-slate-900 mt-0.5 print:text-xs">
+            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 print:p-1.5 print:rounded-lg">
+              <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium print:text-[9px]">Class Rank</div>
+              <div className="text-xs sm:text-xl font-black text-slate-900 dark:text-white mt-0.5 print:text-xs">
                 #{profile.classRank || 1}{' '}
-                <span className="text-[8.5px] sm:text-xs text-slate-400 font-normal print:text-[8.5px]">/ {profile.totalStudentsInClass || 1}</span>
+                <span className="text-[8.5px] sm:text-xs text-slate-400 dark:text-slate-500 font-normal print:text-[8.5px]">/ {profile.totalStudentsInClass || 1}</span>
               </div>
             </div>
-            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 print:p-1.5 print:rounded-lg">
-              <div className="text-[9px] sm:text-[11px] text-slate-500 font-medium print:text-[9px]">School Rank</div>
-              <div className="text-xs sm:text-xl font-black text-slate-900 mt-0.5 print:text-xs">
+            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 print:p-1.5 print:rounded-lg">
+              <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium print:text-[9px]">School Rank</div>
+              <div className="text-xs sm:text-xl font-black text-slate-900 dark:text-white mt-0.5 print:text-xs">
                 #{profile.schoolRank || 1}{' '}
-                <span className="text-[8.5px] sm:text-xs text-slate-400 font-normal print:text-[8.5px]">/ {profile.totalStudentsInSchool || 1}</span>
+                <span className="text-[8.5px] sm:text-xs text-slate-400 dark:text-slate-500 font-normal print:text-[8.5px]">/ {profile.totalStudentsInSchool || 1}</span>
               </div>
             </div>
-            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 print:p-1.5 print:rounded-lg">
-              <div className="text-[9px] sm:text-[11px] text-slate-500 font-medium print:text-[9px]">Overall Standing</div>
-              <div className="text-xs sm:text-xl font-black text-blue-600 mt-0.5 print:text-xs">
+            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 print:p-1.5 print:rounded-lg">
+              <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium print:text-[9px]">Overall Standing</div>
+              <div className="text-xs sm:text-xl font-black text-blue-600 dark:text-blue-400 mt-0.5 print:text-xs">
                 #{profile.overallRank ?? profile.rank ?? 1}{' '}
-                <span className="text-[8.5px] sm:text-xs text-slate-400 font-normal print:text-[8.5px]">/ {profile.totalStudentsOverall || 1}</span>
+                <span className="text-[8.5px] sm:text-xs text-slate-400 dark:text-slate-500 font-normal print:text-[8.5px]">/ {profile.totalStudentsOverall || 1}</span>
               </div>
             </div>
           </div>
@@ -535,25 +535,25 @@ export default function PublicStudentScorecardPage() {
           {/* SECTION: CATEGORY SPR SUMMARY TABLE */}
           <div className="print-category-summary-section space-y-2 sm:space-y-3 print:space-y-1.5 page-break-avoid">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center space-x-1.5 print:text-[10px]">
-                <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-1.5 print:text-[10px]">
+                <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
                 <span>Cumulative Category Performance Summary</span>
               </h3>
-              <span className="text-[10px] text-slate-500 hidden sm:inline print:hidden font-medium">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:inline print:hidden font-medium">
                 Click any category row to view itemized records below
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-slate-200 print:rounded-lg overflow-hidden shadow-xs">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 print:rounded-lg overflow-hidden shadow-xs">
               <table className="w-full text-left text-xs print:text-[9.5px]">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-semibold">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                   <tr>
                     <th className="py-2.5 px-3 print:py-1 print:px-2">Category</th>
                     <th className="py-2.5 px-3 print:py-1 print:px-2">Assessment Records</th>
                     <th className="py-2.5 px-3 text-right print:py-1 print:px-2">Earned SPR Points</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
                   {categoriesList.map((cat: any) => {
                     const earned = typeof cat.earnedPoints === 'number' ? cat.earnedPoints : 0;
                     const isSelected =
@@ -568,8 +568,8 @@ export default function PublicStudentScorecardPage() {
                         onClick={() => setSelectedCategoryId(cat.categoryId || cat.categoryCode)}
                         className={`cursor-pointer transition-all duration-150 ${
                           isSelected
-                            ? 'bg-blue-50/90 font-semibold text-blue-950 ring-1 ring-inset ring-blue-300'
-                            : 'hover:bg-slate-50 text-slate-800'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/40 font-semibold text-blue-950 dark:text-blue-200 ring-1 ring-inset ring-blue-300 dark:ring-blue-700'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
                         }`}
                         title="Click to view assessment records below"
                       >
@@ -577,30 +577,30 @@ export default function PublicStudentScorecardPage() {
                           <div className="flex items-center space-x-2">
                             <div
                               className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 print:hidden ${
-                                isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                                isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                               }`}
                             >
                               <IconComp className="w-3.5 h-3.5" />
                             </div>
-                            <span className="font-bold text-slate-900">{cat.categoryName}</span>
+                            <span className="font-bold text-slate-900 dark:text-white">{cat.categoryName}</span>
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 print:py-0.5 print:px-2 font-medium text-slate-700 font-mono">
+                        <td className="py-2.5 px-3 print:py-0.5 print:px-2 font-medium text-slate-700 dark:text-slate-300 font-mono">
                           {cat.rawInput || `${cat.recordsCount || 0} record(s)`}
                         </td>
-                        <td className="py-2.5 px-3 print:py-0.5 print:px-2 text-right font-black text-blue-800 font-mono text-xs">
+                        <td className="py-2.5 px-3 print:py-0.5 print:px-2 text-right font-black text-blue-800 dark:text-blue-300 font-mono text-xs">
                           +{formatPoints(earned)} pts
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-slate-50 font-bold border-t-2 border-slate-300">
+                <tfoot className="bg-slate-50 dark:bg-slate-800/70 font-bold border-t-2 border-slate-300 dark:border-slate-700">
                   <tr>
-                    <td colSpan={2} className="py-2.5 px-3 text-slate-900 font-black uppercase text-xs print:text-[9.5px]">
+                    <td colSpan={2} className="py-2.5 px-3 text-slate-900 dark:text-white font-black uppercase text-xs print:text-[9.5px]">
                       TOTAL CUMULATIVE SPR POINTS
                     </td>
-                    <td className="py-2.5 px-3 text-right font-black text-sm text-blue-900 font-mono print:text-xs">
+                    <td className="py-2.5 px-3 text-right font-black text-sm text-blue-900 dark:text-blue-300 font-mono print:text-xs">
                       {formatPoints(profile.overallScore ?? profile.overallSPR)} PTS
                     </td>
                   </tr>
@@ -610,22 +610,22 @@ export default function PublicStudentScorecardPage() {
           </div>
 
           {/* SECTION: DEDICATED LIBRARY & KUTHBKHANA POINTS TABLE */}
-          <div className="print-library-section rounded-2xl border border-teal-200 bg-teal-50/40 p-4 space-y-2 print:p-2 print:rounded-lg page-break-avoid">
+          <div className="print-library-section rounded-2xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/40 dark:bg-teal-950/20 p-4 space-y-2 print:p-2 print:rounded-lg page-break-avoid">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Library className="w-4 h-4 text-teal-700" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-teal-950 print:text-[9px]">
+                <Library className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                <h4 className="text-xs font-black uppercase tracking-wider text-teal-950 dark:text-teal-200 print:text-[9px]">
                   Library &amp; Kuthbkhana Milestones (Exact Points &amp; Admin Weightage)
                 </h4>
               </div>
-              <span className="text-[10.5px] font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded-md font-mono print:text-[8px]">
+              <span className="text-[10.5px] font-bold text-teal-800 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/50 px-2 py-0.5 rounded-md font-mono print:text-[8px]">
                 Direct Evaluated Points
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-teal-200 bg-white">
+            <div className="overflow-x-auto rounded-xl border border-teal-200 dark:border-teal-900/60 bg-white dark:bg-slate-900">
               <table className="w-full text-left text-xs print:text-[9px]">
-                <thead className="bg-teal-50/80 border-b border-teal-200 text-teal-900 font-semibold">
+                <thead className="bg-teal-50/80 dark:bg-teal-950/40 border-b border-teal-200 dark:border-teal-800/60 text-teal-900 dark:text-teal-200 font-semibold">
                   <tr>
                     <th className="py-2 px-3">Reading Milestone / Text</th>
                     <th className="py-2 px-3 text-center">Score / Metric</th>
@@ -633,10 +633,10 @@ export default function PublicStudentScorecardPage() {
                     <th className="py-2 px-3 text-right">Earned Points</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-teal-100">
+                <tbody className="divide-y divide-teal-100 dark:divide-teal-900/40">
                   {libraryItems.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-3 px-3 text-center text-slate-500 font-medium">
+                      <td colSpan={4} className="py-3 px-3 text-center text-slate-500 dark:text-slate-400 font-medium">
                         No library or Kuthbkhana reading records logged yet.
                       </td>
                     </tr>
@@ -649,29 +649,29 @@ export default function PublicStudentScorecardPage() {
                       const subLabel = item.subCategoryName || (item.booksRead ? `${item.booksRead} Books Read` : item.type);
 
                       return (
-                        <tr key={item.id || idx} className="hover:bg-teal-50/30 transition">
+                        <tr key={item.id || idx} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/20 transition">
                           <td className="py-2 px-3">
-                            <div className="font-bold text-slate-900">{title}</div>
-                            {subLabel && <div className="text-[10px] text-slate-500">{subLabel}</div>}
+                            <div className="font-bold text-slate-900 dark:text-white">{title}</div>
+                            {subLabel && <div className="text-[10px] text-slate-500 dark:text-slate-400">{subLabel}</div>}
                           </td>
-                          <td className="py-2 px-3 text-center font-mono font-medium text-slate-700">
+                          <td className="py-2 px-3 text-center font-mono font-medium text-slate-700 dark:text-slate-300">
                             {item.booksRead !== undefined ? `${item.booksRead} Books (${baseScore} pts)` : `${baseScore} pts`}
                           </td>
-                          <td className="py-2 px-3 text-center font-mono font-bold text-teal-800">
+                          <td className="py-2 px-3 text-center font-mono font-bold text-teal-800 dark:text-teal-300">
                             {mult.toFixed(1)}x
                           </td>
-                          <td className="py-2 px-3 text-right font-mono font-black text-teal-900">
+                          <td className="py-2 px-3 text-right font-mono font-black text-teal-900 dark:text-teal-200">
                             +{formatPoints(earned)} pts
                           </td>
                         </tr>
                       );
                     })
                   )}
-                  <tr className="bg-teal-50/80 font-bold border-t-2 border-teal-300">
-                    <td colSpan={3} className="py-2 px-3 font-black text-teal-950 uppercase text-[10px]">
+                  <tr className="bg-teal-50/80 dark:bg-teal-950/50 font-bold border-t-2 border-teal-300 dark:border-teal-800">
+                    <td colSpan={3} className="py-2 px-3 font-black text-teal-950 dark:text-teal-200 uppercase text-[10px]">
                       Accumulated Library SPR Points Total
                     </td>
-                    <td className="py-2 px-3 text-right font-black text-teal-900 font-mono text-xs">
+                    <td className="py-2 px-3 text-right font-black text-teal-900 dark:text-teal-300 font-mono text-xs">
                       +{formatPoints(libraryEarnedPoints)} PTS
                     </td>
                   </tr>
@@ -746,23 +746,23 @@ export default function PublicStudentScorecardPage() {
               return (
                 <div
                   key={cat.categoryId || cat.categoryCode}
-                  className="print-itemized-section rounded-2xl border-2 border-blue-200/80 bg-gradient-to-b from-blue-50/40 via-white to-white p-3 sm:p-5 space-y-3.5 shadow-sm print:p-2.5 print:rounded-xl print:space-y-2 page-break-avoid"
+                  className="print-itemized-section rounded-2xl border-2 border-blue-200/80 dark:border-slate-800 bg-gradient-to-b from-blue-50/40 via-white to-white dark:from-slate-900/80 dark:via-slate-900 dark:to-slate-900 p-3 sm:p-5 space-y-3.5 shadow-sm print:p-2.5 print:rounded-xl print:space-y-2 page-break-avoid"
                 >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2.5 border-b border-blue-100">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2.5 border-b border-blue-100 dark:border-slate-800">
                     <div className="flex items-center space-x-2.5">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shrink-0 print:w-7 print:h-7 print:rounded-lg">
                         <IconComp className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-1.5">
-                          <h4 className="text-xs sm:text-base font-black text-slate-900 print:text-xs">
+                          <h4 className="text-xs sm:text-base font-black text-slate-900 dark:text-white print:text-xs">
                             {cat.categoryName} Assessment Records
                           </h4>
-                          <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200 font-mono print:text-[8px]">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-mono print:text-[8px]">
                             {isExam ? 'Academic Evaluation' : 'Points & Weightage Scoring'}
                           </span>
                         </div>
-                        <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium print:text-[8.5px]">
+                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium print:text-[8.5px]">
                           {isExam
                             ? 'Evaluated examinations and subject percentages'
                             : 'Evaluated items showing exact score, prize positions, and level multipliers'}
@@ -771,9 +771,9 @@ export default function PublicStudentScorecardPage() {
                     </div>
 
                     <div className="flex items-center space-x-2 self-end sm:self-center">
-                      <div className="text-right bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 shadow-2xs print:px-2 print:py-0.5">
-                        <div className="text-[8px] sm:text-[9px] uppercase font-bold text-emerald-800 print:text-[7.5px]">Earned Points</div>
-                        <div className="text-xs sm:text-base font-black text-emerald-700 font-mono leading-none mt-0.5 print:text-xs">
+                      <div className="text-right bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800 shadow-2xs print:px-2 print:py-0.5">
+                        <div className="text-[8px] sm:text-[9px] uppercase font-bold text-emerald-800 dark:text-emerald-300 print:text-[7.5px]">Earned Points</div>
+                        <div className="text-xs sm:text-base font-black text-emerald-700 dark:text-emerald-400 font-mono leading-none mt-0.5 print:text-xs">
                           +{formatPoints(earned)} pts
                         </div>
                       </div>
@@ -783,8 +783,8 @@ export default function PublicStudentScorecardPage() {
                   {/* Assessment / Context Grouped Box Accordions */}
                   <div className="space-y-2.5 print:space-y-1.5">
                     {records.length === 0 ? (
-                      <div className="p-4 text-center rounded-xl bg-slate-50 border border-slate-200">
-                        <div className="text-xs font-bold text-slate-700">
+                      <div className="p-4 text-center rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
                           No assessment records logged yet for {cat.categoryName}.
                         </div>
                       </div>
@@ -794,22 +794,22 @@ export default function PublicStudentScorecardPage() {
                         return (
                           <div
                             key={group.key}
-                            className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs print:rounded-lg"
+                            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-2xs print:rounded-lg"
                           >
                             <button
                               type="button"
                               onClick={() => !isPrintOnly && toggleAssessment(group.key)}
-                              className="w-full flex items-center justify-between px-3.5 py-2.5 bg-gradient-to-r from-slate-50 via-blue-50/20 to-white print:bg-slate-50 text-left border-b border-slate-100 print:py-1.5 print:px-2.5 cursor-pointer"
+                              className="w-full flex items-center justify-between px-3.5 py-2.5 bg-gradient-to-r from-slate-50 via-blue-50/20 to-white dark:from-slate-800/80 dark:via-slate-800/40 dark:to-slate-900 print:bg-slate-50 text-left border-b border-slate-100 dark:border-slate-800 print:py-1.5 print:px-2.5 cursor-pointer"
                             >
                               <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs shrink-0 print:w-5 print:h-5">
-                                  <Calendar className="w-3 h-3 text-blue-700" />
+                                <div className="w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 flex items-center justify-center font-bold text-xs shrink-0 print:w-5 print:h-5">
+                                  <Calendar className="w-3 h-3 text-blue-700 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                  <div className="text-xs sm:text-sm font-bold text-slate-900 print:text-[10px]">
+                                  <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white print:text-[10px]">
                                     {group.title}
                                   </div>
-                                  <div className="text-[9.5px] text-slate-500 font-medium print:text-[8px]">
+                                  <div className="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium print:text-[8px]">
                                     {group.records.length} {group.records.length === 1 ? 'Entry' : 'Entries'}
                                   </div>
                                 </div>
@@ -820,23 +820,23 @@ export default function PublicStudentScorecardPage() {
                                   <span
                                     className={`px-2 py-0.5 rounded-md font-mono font-bold text-[10px] sm:text-[11px] print:text-[9px] ${
                                       group.assessmentPct >= 85
-                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                                         : group.assessmentPct >= 70
-                                        ? 'bg-blue-50 text-blue-800 border border-blue-200'
-                                        : 'bg-slate-100 text-slate-700'
+                                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                     }`}
                                   >
                                     {group.assessmentPct.toFixed(1)}%
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-md font-mono font-bold text-[10px] sm:text-[11px] print:text-[9px] bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                  <span className="px-2 py-0.5 rounded-md font-mono font-bold text-[10px] sm:text-[11px] print:text-[9px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                     +{formatPoints(group.groupEarnedPoints)} pts
                                   </span>
                                 )}
                                 {!isPrintOnly && (
                                   <ChevronRight
-                                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 print:hidden ${
-                                      !isCollapsed ? 'rotate-90 text-blue-600' : ''
+                                    className={`w-3.5 h-3.5 text-slate-400 dark:text-slate-500 transition-transform duration-200 print:hidden ${
+                                      !isCollapsed ? 'rotate-90 text-blue-600 dark:text-blue-400' : ''
                                     }`}
                                   />
                                 )}
@@ -845,7 +845,7 @@ export default function PublicStudentScorecardPage() {
 
                             <div className={`${isCollapsed ? 'hidden' : 'block'}`}>
                               <table className="w-full text-left text-xs print:text-[9px]">
-                                <thead className="bg-slate-50/70 border-b border-slate-100 text-slate-500 uppercase tracking-wider font-semibold text-[9.5px] print:text-[8px]">
+                                <thead className="bg-slate-50/70 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[9.5px] print:text-[8px]">
                                   {isExam ? (
                                     <tr>
                                       <th className="py-1.5 px-3 print:py-1 print:px-2">Subject / Exam Detail</th>
@@ -860,7 +860,7 @@ export default function PublicStudentScorecardPage() {
                                     </tr>
                                   )}
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 bg-white">
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
                                   {group.records.map((r: any, rIdx: number) => {
                                     const recordPct =
                                       typeof r.percentage === 'number' ? r.percentage : parseFloat(r.percentage || '0');
@@ -893,14 +893,14 @@ export default function PublicStudentScorecardPage() {
                                       typeof r.earnedPoints === 'number' ? r.earnedPoints : baseScore * mult;
 
                                     return (
-                                      <tr key={r.id || rIdx} className="hover:bg-blue-50/30 transition">
+                                      <tr key={r.id || rIdx} className="hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition">
                                         <td className="py-2 px-3 print:py-1 print:px-2">
                                           <div className="space-y-0.5">
-                                            <div className="font-bold text-slate-900 text-xs print:text-[9px]">
+                                            <div className="font-bold text-slate-900 dark:text-white text-xs print:text-[9px]">
                                               {displayName}
                                             </div>
                                             {extraDetail && (
-                                              <div className="text-[9.5px] text-slate-500 font-medium print:text-[8px]">
+                                              <div className="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium print:text-[8px]">
                                                 {extraDetail}
                                               </div>
                                             )}
@@ -912,12 +912,12 @@ export default function PublicStudentScorecardPage() {
                                             <span
                                               className={`px-2 py-0.5 rounded font-mono font-extrabold text-xs print:text-[8.5px] inline-block ${
                                                 recordPct >= 85
-                                                  ? 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                                                  ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                                                   : recordPct >= 70
-                                                  ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                                                  ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                                                   : recordPct >= 50
-                                                  ? 'bg-amber-100 text-amber-900 border border-amber-200'
-                                                  : 'bg-slate-100 text-slate-700'
+                                                  ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                               }`}
                                             >
                                               {recordPct.toFixed(1)}%
@@ -925,13 +925,13 @@ export default function PublicStudentScorecardPage() {
                                           </td>
                                         ) : (
                                           <>
-                                            <td className="py-2 px-3 text-center font-mono font-medium text-slate-700 print:py-1 print:px-2">
+                                            <td className="py-2 px-3 text-center font-mono font-medium text-slate-700 dark:text-slate-300 print:py-1 print:px-2">
                                               {baseScore} pts
                                             </td>
-                                            <td className="py-2 px-3 text-center font-mono font-bold text-blue-700 print:py-1 print:px-2">
+                                            <td className="py-2 px-3 text-center font-mono font-bold text-blue-700 dark:text-blue-400 print:py-1 print:px-2">
                                               {mult.toFixed(2)}x
                                             </td>
-                                            <td className="py-2 px-3 text-right font-mono font-black text-emerald-700 print:py-1 print:px-2">
+                                            <td className="py-2 px-3 text-right font-mono font-black text-emerald-700 dark:text-emerald-400 print:py-1 print:px-2">
                                               +{formatPoints(earnedPts)} pts
                                             </td>
                                           </>
@@ -1011,7 +1011,7 @@ export default function PublicStudentScorecardPage() {
       {/* ========================================================================= */}
       {printModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh] animate-zoom-up">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh] animate-zoom-up">
             {/* Modal Header */}
             <div className="px-6 py-4 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 text-white flex items-center justify-between shadow-md">
               <div className="flex items-center space-x-3">
@@ -1036,10 +1036,10 @@ export default function PublicStudentScorecardPage() {
             </div>
 
             {/* Modal Scrollable Body */}
-            <div className="p-6 overflow-y-auto space-y-6 divide-y divide-slate-100">
+            <div className="p-6 overflow-y-auto space-y-6 divide-y divide-slate-100 dark:divide-slate-800/80">
               {/* Preset Selection Buttons */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
                   1. Choose Print Preset
                 </label>
                 <div className="grid grid-cols-3 gap-2.5">
@@ -1048,12 +1048,12 @@ export default function PublicStudentScorecardPage() {
                     onClick={() => handlePresetChange('OFFICIAL')}
                     className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
                       printPreset === 'OFFICIAL'
-                        ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                        ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 dark:border-blue-500 ring-2 ring-blue-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'
                     }`}
                   >
-                    <div className="font-black text-xs text-slate-900">Official Full Dossier</div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5">All categories, items &amp; signatures</div>
+                    <div className="font-black text-xs text-slate-900 dark:text-white">Official Full Dossier</div>
+                    <div className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">All categories, items &amp; signatures</div>
                   </button>
 
                   <button
@@ -1061,12 +1061,12 @@ export default function PublicStudentScorecardPage() {
                     onClick={() => handlePresetChange('COMPACT')}
                     className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
                       printPreset === 'COMPACT'
-                        ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                        ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 dark:border-blue-500 ring-2 ring-blue-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'
                     }`}
                   >
-                    <div className="font-black text-xs text-slate-900">1-Page Summary</div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5">Compact overview fit on 1 sheet</div>
+                    <div className="font-black text-xs text-slate-900 dark:text-white">1-Page Summary</div>
+                    <div className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">Compact overview fit on 1 sheet</div>
                   </button>
 
                   <button
@@ -1074,27 +1074,27 @@ export default function PublicStudentScorecardPage() {
                     onClick={() => setPrintPreset('CUSTOM')}
                     className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
                       printPreset === 'CUSTOM'
-                        ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                        ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 dark:border-blue-500 ring-2 ring-blue-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'
                     }`}
                   >
-                    <div className="font-black text-xs text-slate-900">Custom Selection</div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5">Pick specific sections below</div>
+                    <div className="font-black text-xs text-slate-900 dark:text-white">Custom Selection</div>
+                    <div className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">Pick specific sections below</div>
                   </button>
                 </div>
               </div>
 
               {/* Section Customization Toggles */}
               <div className="pt-4 space-y-3">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
                   2. Document Sections
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Student Profile &amp; Banner</div>
-                      <div className="text-[10.5px] text-slate-500">Name, SPR ID, Class, Photo</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Student Profile &amp; Banner</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Name, SPR ID, Class, Photo</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1107,10 +1107,10 @@ export default function PublicStudentScorecardPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Ranks &amp; Standings</div>
-                      <div className="text-[10.5px] text-slate-500">Class, School, Overall Ranks</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Ranks &amp; Standings</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Class, School, Overall Ranks</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1123,10 +1123,10 @@ export default function PublicStudentScorecardPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Category Breakdown Table</div>
-                      <div className="text-[10.5px] text-slate-500">Summary table of all categories</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Category Breakdown Table</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Summary table of all categories</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1139,10 +1139,10 @@ export default function PublicStudentScorecardPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Library &amp; Kuthbkhana Section</div>
-                      <div className="text-[10.5px] text-slate-500">Reading milestones &amp; exact points</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Library &amp; Kuthbkhana Section</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Reading milestones &amp; exact points</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1155,10 +1155,10 @@ export default function PublicStudentScorecardPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Itemized Subject &amp; Record Lists</div>
-                      <div className="text-[10.5px] text-slate-500">Individual exam &amp; activity tables</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Itemized Subject &amp; Record Lists</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Individual exam &amp; activity tables</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1171,10 +1171,10 @@ export default function PublicStudentScorecardPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                  <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer">
                     <div>
-                      <div className="text-xs font-bold text-slate-900">Official Signatures &amp; Seal</div>
-                      <div className="text-[10.5px] text-slate-500">Teacher, Controller &amp; Principal</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Official Signatures &amp; Seal</div>
+                      <div className="text-[10.5px] text-slate-500 dark:text-slate-400">Teacher, Controller &amp; Principal</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1192,7 +1192,7 @@ export default function PublicStudentScorecardPage() {
               {/* Category Filter Selection */}
               {includeItemizedRecords && (
                 <div className="pt-4 space-y-2">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
                     3. Categories to Include in Printout
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -1203,7 +1203,7 @@ export default function PublicStudentScorecardPage() {
                       return (
                         <label
                           key={id}
-                          className="flex items-center space-x-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
+                          className="flex items-center space-x-2 p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
                         >
                           <input
                             type="checkbox"
@@ -1217,7 +1217,7 @@ export default function PublicStudentScorecardPage() {
                             }}
                             className="w-3.5 h-3.5 text-blue-600 rounded"
                           />
-                          <span className="text-xs font-medium text-slate-800 truncate">{cat.categoryName}</span>
+                          <span className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{cat.categoryName}</span>
                         </label>
                       );
                     })}
@@ -1227,18 +1227,18 @@ export default function PublicStudentScorecardPage() {
 
               {/* Detail & Layout Mode */}
               <div className="pt-4 space-y-3">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
                   4. Detail &amp; Layout Options
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <div className="text-xs font-semibold text-slate-700">Scoring Format</div>
-                    <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                    <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">Scoring Format</div>
+                    <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
                       <button
                         type="button"
                         onClick={() => setIncludePoints(true)}
                         className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          includePoints ? 'bg-white text-blue-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                          includePoints ? 'bg-white dark:bg-slate-700 text-blue-800 dark:text-blue-200 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Detailed (With Points)
@@ -1247,7 +1247,7 @@ export default function PublicStudentScorecardPage() {
                         type="button"
                         onClick={() => setIncludePoints(false)}
                         className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          !includePoints ? 'bg-white text-blue-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                          !includePoints ? 'bg-white dark:bg-slate-700 text-blue-800 dark:text-blue-200 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Clean (Certificate)
@@ -1256,13 +1256,13 @@ export default function PublicStudentScorecardPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="text-xs font-semibold text-slate-700">Page Layout Fitting</div>
-                    <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                    <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">Page Layout Fitting</div>
+                    <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
                       <button
                         type="button"
                         onClick={() => setPrintPageMode('SINGLE')}
                         className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          printPageMode === 'SINGLE' ? 'bg-white text-blue-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                          printPageMode === 'SINGLE' ? 'bg-white dark:bg-slate-700 text-blue-800 dark:text-blue-200 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Strict 1-Page A4
@@ -1271,7 +1271,7 @@ export default function PublicStudentScorecardPage() {
                         type="button"
                         onClick={() => setPrintPageMode('MULTI')}
                         className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          printPageMode === 'MULTI' ? 'bg-white text-blue-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                          printPageMode === 'MULTI' ? 'bg-white dark:bg-slate-700 text-blue-800 dark:text-blue-200 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         Continuous Multi-Page
@@ -1283,11 +1283,11 @@ export default function PublicStudentScorecardPage() {
             </div>
 
             {/* Modal Footer Actions */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => setPrintModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Cancel
               </button>

@@ -4,6 +4,7 @@ import AppIntro from '@/components/ui/AppIntro';
 import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt';
 import AppUpdateNotification from '@/components/ui/AppUpdateNotification';
 import { AppBootstrapProvider } from '@/context/AppBootstrapContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'SPR — Students Performance Rate | Madin School of Excellence',
@@ -72,6 +73,24 @@ export default function RootLayout({
         <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
         <link rel="apple-touch-startup-image" href="/icon-512.png" />
 
+        {/* Early Theme Detector Script to avoid Flash of Unstyled Content */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('spr_theme');
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+
         {/* Early PWA Event Interceptor & SW Registration Script */}
         <script
           dangerouslySetInnerHTML={{
@@ -126,13 +145,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-madin-900 selection:text-white">
-        <AppBootstrapProvider>
-          <AppIntro />
-          {children}
-          <PWAInstallPrompt />
-          <AppUpdateNotification />
-        </AppBootstrapProvider>
+      <body className="min-h-screen bg-slate-50 dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 antialiased selection:bg-madin-900 selection:text-white transition-colors duration-300">
+        <ThemeProvider>
+          <AppBootstrapProvider>
+            <AppIntro />
+            {children}
+            <PWAInstallPrompt />
+            <AppUpdateNotification />
+          </AppBootstrapProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
