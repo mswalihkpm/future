@@ -396,6 +396,26 @@ export default function PublicHomePage() {
   const displayedLeaderboard = filteredLeaderboard.slice(0, 15);
   const top3 = leaderboard.slice(0, 3);
 
+  // Scroll-driven row reveal observer for leaderboard
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('scroll-reveal-visible');
+          }
+        });
+      },
+      { rootMargin: '0px 0px -25px 0px', threshold: 0.05 }
+    );
+
+    const targets = document.querySelectorAll('.scroll-reveal-target');
+    targets.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [displayedLeaderboard, loadingLeaderboard]);
+
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white antialiased transition-colors duration-300">
       {/* Secret Toast Indicator upon successful 3-click trigger */}
@@ -752,8 +772,20 @@ export default function PublicHomePage() {
                 <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-0.5">Leading institutional benchmarks across all evaluation wings</p>
               </div>
 
-              {/* Horizontal 3-card Podium (grid-cols-3 on mobile and desktop) */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-5 max-w-4xl mx-auto items-end">
+              {/* Mobile horizontal swipe cue */}
+              <div className="sm:hidden flex items-center justify-between px-2 pb-1.5 text-[11px] text-slate-500 font-bold">
+                <span className="flex items-center space-x-1 text-slate-700 dark:text-slate-300">
+                  <span>🏆</span>
+                  <span>Top Honors</span>
+                </span>
+                <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold flex items-center space-x-0.5">
+                  <span>Swipe ranks</span>
+                  <span>➔</span>
+                </span>
+              </div>
+
+              {/* Responsive Horizontal Snap Podium (swipe on mobile, 3-card elevated grid on desktop) */}
+              <div className="flex sm:grid sm:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto items-end overflow-x-auto sm:overflow-visible horizontal-snap-carousel no-scrollbar pb-3 sm:pb-0 px-1 sm:px-0">
                 {/* Left Card (Position 2 in array: top3[1]) */}
                 {(() => {
                   const student = top3[1];
@@ -766,7 +798,7 @@ export default function PublicHomePage() {
                   return (
                     <div
                       onClick={() => handleStudentClick(student?.studentId)}
-                      className={`cursor-pointer rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 border-2 transition-all duration-300 text-center relative order-1 group animate-slide-left delay-200 hover:-translate-y-1 ${
+                      className={`w-[78vw] max-w-[280px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item cursor-pointer rounded-2xl sm:rounded-3xl p-3 sm:p-6 border-2 transition-all duration-300 text-center relative order-2 sm:order-1 group animate-slide-left delay-200 hover:-translate-y-1 ${
                         isGold
                           ? 'bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500'
                           : isSilver
@@ -779,11 +811,11 @@ export default function PublicHomePage() {
                           photoUrl={student?.photoUrl}
                           name={student?.studentName || student?.name || 'Student'}
                           size="lg"
-                          className={`w-11 h-11 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40' : ''}`}
+                          className={`w-12 h-12 sm:w-20 sm:h-20 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40' : ''}`}
                         />
                       </div>
                       <div
-                        className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
+                        className={`text-[8.5px] sm:text-xs font-black uppercase tracking-widest px-2.5 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
                           isGold
                             ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
                             : isSilver
@@ -794,7 +826,7 @@ export default function PublicHomePage() {
                         ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
                       </div>
                       <h4
-                        className={`text-[10px] sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
+                        className={`text-xs sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
                           isGold
                             ? 'text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-400'
                             : 'text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'
@@ -802,7 +834,7 @@ export default function PublicHomePage() {
                       >
                         {student?.studentName || student?.name}
                       </h4>
-                      <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                      <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                         Std {formatClassNumber(student?.className)}
                       </div>
                       <div
@@ -821,7 +853,7 @@ export default function PublicHomePage() {
                   );
                 })()}
 
-                {/* Center Card (Position 1 in array: top3[0] - Elevated) */}
+                {/* Center Card (Position 1 in array: top3[0] - Elevated Champion) */}
                 {(() => {
                   const student = top3[0];
                   const rank = student?.rank ?? 1;
@@ -831,23 +863,23 @@ export default function PublicHomePage() {
                   return (
                     <div
                       onClick={() => handleStudentClick(student?.studentId)}
-                      className={`cursor-pointer bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 rounded-2xl sm:rounded-3xl p-3 sm:p-7 border-2 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500 transition-all duration-300 text-center relative order-2 -translate-y-2 sm:-translate-y-4 group animate-zoom-up delay-100 hover:-translate-y-5`}
+                      className={`w-[82vw] max-w-[290px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item cursor-pointer bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 rounded-2xl sm:rounded-3xl p-3.5 sm:p-7 border-2 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500 transition-all duration-300 text-center relative order-1 sm:order-2 sm:-translate-y-2 lg:-translate-y-4 group animate-zoom-up animate-gold-glow delay-100 hover:-translate-y-5`}
                     >
                       <div className="flex justify-center mb-1.5 sm:mb-2">
                         <StudentAvatar
                           photoUrl={student?.photoUrl}
                           name={student?.studentName || student?.name || 'Student'}
                           size="xl"
-                          className="w-13 h-13 sm:w-24 sm:h-24 ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40"
+                          className="w-14 h-14 sm:w-24 sm:h-24 ring-3 sm:ring-4 ring-amber-300/60 dark:ring-amber-500/40"
                         />
                       </div>
-                      <div className="text-[8px] sm:text-xs font-black text-amber-700 dark:text-amber-300 uppercase tracking-widest bg-amber-100 dark:bg-amber-950/70 px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300 dark:border-amber-800">
+                      <div className="text-[8.5px] sm:text-xs font-black text-amber-700 dark:text-amber-300 uppercase tracking-widest bg-amber-100 dark:bg-amber-950/70 px-2.5 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300 dark:border-amber-800">
                         ★ {rank === 1 ? '1st' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
                       </div>
                       <h4 className="text-xs sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-400 mt-1 transition-colors leading-tight break-words">
                         {student?.studentName || student?.name}
                       </h4>
-                      <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                      <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                         Std {formatClassNumber(student?.className)}
                       </div>
                       <div className="mt-1.5 sm:mt-4 pt-1.5 sm:pt-3 border-t border-amber-100 dark:border-amber-950/60 flex items-center justify-center sm:justify-between">
@@ -872,7 +904,7 @@ export default function PublicHomePage() {
                   return (
                     <div
                       onClick={() => handleStudentClick(student?.studentId)}
-                      className={`cursor-pointer rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 border-2 transition-all duration-300 text-center relative order-3 group animate-slide-right delay-200 hover:-translate-y-1 ${
+                      className={`w-[78vw] max-w-[280px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item cursor-pointer rounded-2xl sm:rounded-3xl p-3 sm:p-6 border-2 transition-all duration-300 text-center relative order-3 sm:order-3 group animate-slide-right delay-200 hover:-translate-y-1 ${
                         isGold
                           ? 'bg-gradient-to-b from-amber-50/95 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-amber-400 dark:border-amber-500/70 shadow-xl hover:shadow-2xl hover:border-amber-500'
                           : isSilver
@@ -1052,14 +1084,14 @@ export default function PublicHomePage() {
                         key={row.studentId}
                         onClick={() => handleStudentClick(row.studentId)}
                         style={{ animationDelay: `${Math.min(idx * 20, 350)}ms` }}
-                        className={`animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
+                        className={`scroll-driven-row scroll-reveal-target scroll-reveal-hidden animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
                           isTop1 ? 'bg-amber-50/20 dark:bg-amber-950/10' : ''
                         }`}
                         title="Click to view full student profile and score origin breakdown"
                       >
                         <td className="py-2 sm:py-3.5 px-1.5 sm:px-4 text-center">
                           {isTop1 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400 text-amber-950 font-black text-[10px] sm:text-xs shadow-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400 text-amber-950 font-black text-[10px] sm:text-xs shadow-xs animate-gold-glow">
                               1
                             </span>
                           ) : isTop2 ? (

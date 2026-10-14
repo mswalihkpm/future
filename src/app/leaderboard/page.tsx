@@ -16,6 +16,7 @@ import {
   Library,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   Flag,
   RotateCcw,
   RefreshCw,
@@ -35,6 +36,9 @@ import PublicFooter from '@/components/layout/PublicFooter';
 import { getAcademicMasterData } from '@/lib/academic-client';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAppBootstrap } from '@/context/AppBootstrapContext';
+import HorizontalScrollRibbon from '@/components/leaderboard/HorizontalScrollRibbon';
+import ScrollProgressBar from '@/components/leaderboard/ScrollProgressBar';
+import ScrollToTopHUD from '@/components/leaderboard/ScrollToTopHUD';
 
 // Global client-side memory caches for 0ms instant loading
 const clientLeaderboardMemory = new Map<string, any[]>();
@@ -854,46 +858,141 @@ function deriveCategoryLeaderboard(
   const isProgramsActive = currentCategory?.code === 'PROGRAMS';
   const isLibraryActive = currentCategory?.code === 'LIBRARY';
 
+  const activeCategoryKey = isOverallActive
+    ? 'OVERALL'
+    : isQualActive
+    ? 'QUALIFICATION'
+    : isIslamicActive
+    ? 'ISLAMIC'
+    : isFestActive
+    ? 'LITERARY'
+    : isSchoolActive
+    ? 'SCHOOL'
+    : isCreativeActive
+    ? 'CREATIVE_HUB'
+    : isProgramsActive
+    ? 'PROGRAMS'
+    : isLibraryActive
+    ? 'LIBRARY'
+    : '';
+
+  // Scroll-Driven Animation State
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isHeroPassed, setIsHeroPassed] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const y = window.scrollY;
+          setIsScrolled(y > 45);
+          setIsHeroPassed(y > 320);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // IntersectionObserver for scroll-driven row reveal
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('scroll-reveal-visible');
+          }
+        });
+      },
+      { rootMargin: '0px 0px -25px 0px', threshold: 0.05 }
+    );
+
+    const targets = document.querySelectorAll('.scroll-reveal-target');
+    targets.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [filteredEntries, loading]);
+
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#080e1e] text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300">
-      {/* Top Header with Low Opacity, Blur & Clean Navigation */}
-      <header className="sticky top-0 z-40 bg-white/20 dark:bg-slate-950/45 backdrop-blur-md border-b border-white/30 dark:border-slate-800/40 shadow-xs py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8 animate-slide-down print:hidden">
+      {/* Scroll-Driven Top Progress Bar */}
+      <ScrollProgressBar showPercentage={true} />
+
+      {/* Top Header with Scroll-Driven Contraction, Low Opacity Blur & Clean Navigation */}
+      <header
+        className={`sticky top-0 z-40 backdrop-blur-md border-b shadow-xs px-4 sm:px-6 lg:px-8 print:hidden transition-all duration-300 ${
+          isScrolled
+            ? 'bg-white/95 dark:bg-slate-950/95 border-slate-300/80 dark:border-slate-800/80 py-2 sm:py-2.5 shadow-sm'
+            : 'bg-white/40 dark:bg-slate-950/45 border-white/30 dark:border-slate-800/40 py-2.5 sm:py-3'
+        }`}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
-              <Image
-                src="/logo.png"
-                alt="Madin SPR"
-                width={44}
-                height={44}
-                className="w-full h-full object-contain"
-                priority
-              />
-            </div>
-            <div>
-              {/* Desktop Branding */}
-              <div className="hidden sm:block">
-                <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                  Madin School of Excellence
-                </div>
-                <h1 className="text-sm sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-                  STUDENTS PERFORMANCE RATE (SPR)
-                </h1>
+          <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+            <Link href="/" className="flex items-center space-x-2.5 sm:space-x-3 group shrink-0">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src="/logo.png"
+                  alt="Madin SPR"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-contain"
+                  priority
+                />
               </div>
-
-              {/* Clean Mobile Branding */}
-              <div className="sm:hidden flex flex-col">
-                <div className="text-[11px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
-                  MADIN EXCELLENCE
+              <div>
+                {/* Desktop Branding */}
+                <div className="hidden sm:block">
+                  <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    Madin School of Excellence
+                  </div>
+                  <h1 className="text-sm sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                    STUDENTS PERFORMANCE RATE (SPR)
+                  </h1>
                 </div>
-                <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
-                  <span className="text-[9px] font-black tracking-widest uppercase">SPR STANDINGS</span>
+
+                {/* Clean Mobile Branding */}
+                <div className="sm:hidden flex flex-col">
+                  <div className="text-[11px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
+                    MADIN EXCELLENCE
+                  </div>
+                  <div className="mt-0.5 inline-flex items-center px-1.5 py-0.2 rounded-full bg-blue-600 text-white shadow-2xs">
+                    <span className="text-[8.5px] font-black tracking-widest uppercase">SPR STANDINGS</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
+            </Link>
 
-          <div className="flex items-center space-x-2">
+            {/* Scroll-Driven Mini Active Context Ticker (fades in when hero banner scrolls past) */}
+            <div
+              className={`hidden md:flex items-center space-x-2 pl-3 border-l border-slate-200 dark:border-slate-800 transition-all duration-300 ${
+                isHeroPassed
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-3 pointer-events-none'
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900 transition shadow-2xs"
+                title="Click to scroll to top"
+              >
+                <span>{heroTheme.badge}</span>
+                <span className="text-slate-400 dark:text-slate-500">•</span>
+                <span className="truncate max-w-[160px]">{heroTheme.title}</span>
+                <ArrowUp className="w-3 h-3 ml-0.5 text-blue-500" />
+              </button>
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                {filteredEntries.length} Ranked
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 shrink-0">
             <Link
               href="/"
               className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition btn-interactive"
@@ -909,10 +1008,17 @@ function deriveCategoryLeaderboard(
       <main className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-5 flex-1 print:hidden">
         {/* Dedicated Separate Leaderboards Switcher Navigation Bar */}
         <div className="space-y-2 animate-slide-up">
-          {/* Level 1: Primary Category / Wing Tabs */}
-          <div className="bg-white dark:bg-slate-900 p-1.5 sm:p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar">
+          {/* Level 1: Primary Category / Wing Tabs with Horizontal Scroll Ribbon & Fade Masks */}
+          <HorizontalScrollRibbon
+            activeItemId={activeCategoryKey}
+            className="rounded-2xl shadow-xs"
+            containerClassName="bg-white dark:bg-slate-900 p-1.5 sm:p-2 rounded-2xl border border-slate-200 dark:border-slate-800 items-center gap-1.5"
+            ariaLabel="Primary assessment wing filters"
+          >
             {/* Overall SPR */}
             <button
+              data-item-id="OVERALL"
+              data-active={isOverallActive}
               onClick={() => switchLeaderboard({ type: 'OVERALL' })}
               className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-150 shrink-0 flex items-center space-x-1.5 ${
                 isOverallActive
@@ -926,6 +1032,8 @@ function deriveCategoryLeaderboard(
 
             {/* Qualification */}
             <button
+              data-item-id="QUALIFICATION"
+              data-active={isQualActive}
               onClick={() => {
                 const qCat = categories.find((c) => c.code === 'QUALIFICATION' || c.name?.toLowerCase().includes('qualif'));
                 switchLeaderboard({ type: 'CATEGORY', categoryId: qCat ? qCat.id : 'QUALIFICATION' });
@@ -942,6 +1050,8 @@ function deriveCategoryLeaderboard(
 
             {/* Islamic Studies */}
             <button
+              data-item-id="ISLAMIC"
+              data-active={isIslamicActive}
               onClick={() => switchLeaderboard({ type: 'STREAM', stream: 'JAMIATHUL_HIND' })}
               className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-150 shrink-0 flex items-center space-x-1.5 ${
                 isIslamicActive
@@ -955,6 +1065,8 @@ function deriveCategoryLeaderboard(
 
             {/* Literary Festivals */}
             <button
+              data-item-id="LITERARY"
+              data-active={isFestActive}
               onClick={() => {
                 const litCat = categories.find((c) => c.code === 'LITERARY');
                 switchLeaderboard({ type: 'CATEGORY', categoryId: litCat?.id || 'LITERARY' });
@@ -971,6 +1083,8 @@ function deriveCategoryLeaderboard(
 
             {/* School Education */}
             <button
+              data-item-id="SCHOOL"
+              data-active={isSchoolActive}
               onClick={() => {
                 const cat = categories.find((c) => c.code === 'SCHOOL');
                 switchLeaderboard({ type: 'CATEGORY', categoryId: cat?.id || 'SCHOOL' });
@@ -987,6 +1101,8 @@ function deriveCategoryLeaderboard(
 
             {/* Creative Hub */}
             <button
+              data-item-id="CREATIVE_HUB"
+              data-active={isCreativeActive}
               onClick={() => {
                 const cat = categories.find((c) => c.code === 'CREATIVE_HUB');
                 switchLeaderboard({ type: 'CATEGORY', categoryId: cat?.id || 'CREATIVE_HUB' });
@@ -1003,6 +1119,8 @@ function deriveCategoryLeaderboard(
 
             {/* Programs & Leadership */}
             <button
+              data-item-id="PROGRAMS"
+              data-active={isProgramsActive}
               onClick={() => {
                 const cat = categories.find((c) => c.code === 'PROGRAMS');
                 switchLeaderboard({ type: 'CATEGORY', categoryId: cat?.id || 'PROGRAMS' });
@@ -1019,6 +1137,8 @@ function deriveCategoryLeaderboard(
 
             {/* Library / Reading */}
             <button
+              data-item-id="LIBRARY"
+              data-active={isLibraryActive}
               onClick={() => {
                 const cat = categories.find((c) => c.code === 'LIBRARY');
                 switchLeaderboard({ type: 'CATEGORY', categoryId: cat?.id || 'LIBRARY' });
@@ -1032,21 +1152,28 @@ function deriveCategoryLeaderboard(
               <Library className={`w-3.5 h-3.5 ${isLibraryActive ? 'text-amber-200' : 'text-amber-600'}`} />
               <span>📚 Library</span>
             </button>
-          </div>
+          </HorizontalScrollRibbon>
 
           {/* Level 2: Subcategory Pills for Active Category with Subcategories */}
           {activeCategorySubcategories.length > 0 && (
-            <div className={`flex items-center gap-1.5 sm:gap-2 overflow-x-auto p-1.5 sm:p-2 rounded-2xl border animate-slide-down ${
-              currentCategory?.code === 'LITERARY'
-                ? 'bg-rose-50/90 border-rose-200/80'
-                : 'bg-blue-50/90 border-blue-200/80'
-            }`}>
+            <HorizontalScrollRibbon
+              activeItemId={selectedSubcategory || 'ALL'}
+              className="rounded-2xl animate-slide-down shadow-xs"
+              containerClassName={`p-1.5 sm:p-2 rounded-2xl border items-center gap-1.5 sm:gap-2 ${
+                currentCategory?.code === 'LITERARY'
+                  ? 'bg-rose-50/90 border-rose-200/80'
+                  : 'bg-blue-50/90 border-blue-200/80'
+              }`}
+              ariaLabel="Subcategory filters"
+            >
               <span className={`text-[10px] uppercase font-black ml-1.5 shrink-0 ${
                 currentCategory?.code === 'LITERARY' ? 'text-rose-900' : 'text-blue-900'
               }`}>
                 Subcategories:
               </span>
               <button
+                data-item-id="ALL"
+                data-active={!selectedSubcategory}
                 onClick={() => switchLeaderboard({ type: 'CATEGORY', categoryId: selectedCategory || activeCategoryId || qualCat?.id || 'QUALIFICATION' })}
                 className={`px-2.5 sm:px-3 py-1 rounded-xl text-[11px] sm:text-xs font-bold transition shrink-0 flex items-center space-x-1 ${
                   !selectedSubcategory
@@ -1070,6 +1197,8 @@ function deriveCategoryLeaderboard(
                 return (
                   <button
                     key={sub.id}
+                    data-item-id={sub.id}
+                    data-active={isSelected}
                     onClick={() => switchLeaderboard({ type: 'SUBCATEGORY', categoryId: selectedCategory || activeCategoryId || qualCat?.id || 'QUALIFICATION', subcategoryId: sub.id })}
                     className={`px-2.5 sm:px-3 py-1 rounded-xl text-[11px] sm:text-xs font-bold transition shrink-0 flex items-center space-x-1.5 ${
                       isSelected
@@ -1082,14 +1211,21 @@ function deriveCategoryLeaderboard(
                   </button>
                 );
               })}
-            </div>
+            </HorizontalScrollRibbon>
           )}
 
           {/* Level 2: Subcategory Pills for Multi-Stream Wings (Islamic Studies) */}
           {isIslamicActive && (
-            <div className="flex items-center gap-2 overflow-x-auto p-1.5 sm:p-2 bg-blue-50/90 rounded-2xl border border-blue-200/80 animate-slide-down">
+            <HorizontalScrollRibbon
+              activeItemId={selectedStream || (selectedCategory && !selectedStream ? 'COMBINED' : '')}
+              className="rounded-2xl animate-slide-down shadow-xs"
+              containerClassName="p-1.5 sm:p-2 bg-blue-50/90 rounded-2xl border border-blue-200/80 items-center gap-2"
+              ariaLabel="Islamic studies stream filters"
+            >
               <span className="text-[10px] uppercase font-black text-blue-900 ml-1.5 shrink-0">Select Stream:</span>
               <button
+                data-item-id="JAMIATHUL_HIND"
+                data-active={selectedStream === 'JAMIATHUL_HIND'}
                 onClick={() => switchLeaderboard({ type: 'STREAM', stream: 'JAMIATHUL_HIND' })}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 flex items-center space-x-1.5 ${
                   selectedStream === 'JAMIATHUL_HIND'
@@ -1100,6 +1236,8 @@ function deriveCategoryLeaderboard(
                 <span>🕌 Jamiathul Hind</span>
               </button>
               <button
+                data-item-id="MADIN_ACADEMY"
+                data-active={selectedStream === 'MADIN_ACADEMY'}
                 onClick={() => switchLeaderboard({ type: 'STREAM', stream: 'MADIN_ACADEMY' })}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 flex items-center space-x-1.5 ${
                   selectedStream === 'MADIN_ACADEMY'
@@ -1110,6 +1248,8 @@ function deriveCategoryLeaderboard(
                 <span>🏛️ Ma'din Academy</span>
               </button>
               <button
+                data-item-id="COMBINED"
+                data-active={Boolean(selectedCategory && !selectedStream && currentCategory?.code === 'ISLAMIC')}
                 onClick={() => {
                   const cat = categories.find((c) => c.code === 'ISLAMIC');
                   if (cat) switchLeaderboard({ type: 'CATEGORY', categoryId: cat.id });
@@ -1122,13 +1262,13 @@ function deriveCategoryLeaderboard(
               >
                 <span>📋 Combined Islamic</span>
               </button>
-            </div>
+            </HorizontalScrollRibbon>
           )}
         </div>
 
-        {/* Dynamic Themed Subcategory Hero Banner (With Logo at Left Top, Name at Left Top, Tiny White Glow) */}
+        {/* Dynamic Themed Subcategory Hero Banner (With Scroll-Driven Parallax, Logo at Left Top, Name at Left Top, Tiny White Glow) */}
         <div
-          className={`relative rounded-3xl p-5 sm:p-7 shadow-xl border ${heroTheme.borderColor} ${heroTheme.bgGradient} text-white animate-slide-up z-20`}
+          className={`relative rounded-3xl p-5 sm:p-7 shadow-xl border ${heroTheme.borderColor} ${heroTheme.bgGradient} text-white animate-slide-up z-20 scroll-driven-hero transition-all duration-300`}
         >
           {/* Subtle Ambient Tiny White Glow Effect */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
@@ -1300,142 +1440,160 @@ function deriveCategoryLeaderboard(
                 })()}
               </div>
             ) : (
-              /* 2 or 3 Card Podium */
-              <div className={`grid ${filteredEntries.length === 2 ? 'grid-cols-2 max-w-lg' : 'grid-cols-3 max-w-4xl'} gap-2 sm:gap-4 mx-auto items-end`}>
-                {/* Position 2 in topThree */}
-                {topThree[1] && (() => {
-                  const student = topThree[1];
-                  const rank = student?.rank ?? 2;
-                  const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
-                  const isGold = rank === 1;
-                  const isSilver = rank === 2;
-                  const isBronze = rank === 3;
-                  return (
-                    <div
-                      onClick={() => handleStudentRowClick(student.studentId)}
-                      className={`rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 border-2 shadow-xs cursor-pointer hover:shadow-md transition-all flex flex-col justify-between order-1 text-center group animate-slide-left ${
-                        isGold
-                          ? 'bg-gradient-to-b from-amber-50/90 via-white to-white border-amber-400 -translate-y-2 sm:-translate-y-3'
-                          : isSilver
-                          ? 'bg-white border-slate-200'
-                          : 'bg-white border-amber-200'
-                      }`}
-                    >
-                      <div className="flex justify-center mb-1 sm:mb-2">
-                        <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="lg" className={`w-11 h-11 sm:w-18 sm:h-18 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`} />
-                      </div>
-                      <div className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
-                        isGold
-                          ? 'bg-amber-100 text-amber-700 border-amber-300'
-                          : isSilver
-                          ? 'bg-slate-100/90 text-slate-700 border-slate-200'
-                          : 'bg-amber-100/90 text-amber-800 border-amber-200'
-                      }`}>
-                        ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
-                      </div>
-                      <div className={`text-[10px] sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
-                        isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
-                      }`}>
-                        {student.name || student.studentName}
-                      </div>
-                      <div className="text-[9px] sm:text-xs text-slate-500 mt-0.5">
-                        Std {formatClassNumber(student.className)}
-                      </div>
-                      <div className={`mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t flex items-center justify-center ${
-                        isGold ? 'border-amber-100' : 'border-slate-100'
-                      }`}>
-                        <span className={`text-xs sm:text-lg font-black ${
-                          isGold ? 'text-amber-800' : 'text-slate-800'
-                        }`}>
-                          {formatScore(student.spr ?? student.overallScore)} pts
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
+              /* 2 or 3 Card Podium with Mobile Horizontal Snap Carousel & Desktop 3-Column Podium */
+              <div>
+                {/* Mobile horizontal swipe cue */}
+                <div className="sm:hidden flex items-center justify-between px-2 pb-1.5 text-[11px] text-slate-500 font-bold">
+                  <span className="flex items-center space-x-1 text-slate-700 dark:text-slate-300">
+                    <span>🏆</span>
+                    <span>Top Honors</span>
+                  </span>
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold flex items-center space-x-0.5">
+                    <span>Swipe ranks</span>
+                    <span>➔</span>
+                  </span>
+                </div>
 
-                {/* Position 1 in topThree */}
-                {topThree[0] && (() => {
-                  const student = topThree[0];
-                  const rank = student?.rank ?? 1;
-                  const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
-                  return (
-                    <div
-                      onClick={() => handleStudentRowClick(student.studentId)}
-                      className="bg-gradient-to-b from-amber-50/90 via-white to-white rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-md border-2 border-amber-400 cursor-pointer hover:shadow-xl transition-all flex flex-col justify-between order-2 -translate-y-2 sm:-translate-y-3 text-center group animate-zoom-up"
-                    >
-                      <div className="flex justify-center mb-1 sm:mb-2">
-                        <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="xl" className="w-13 h-13 sm:w-22 sm:h-22 ring-3 sm:ring-4 ring-amber-300/60" />
-                      </div>
-                      <div className="text-[8px] sm:text-xs font-black text-amber-700 uppercase tracking-widest bg-amber-100 px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300">
-                        ★ {rank === 1 ? '1st' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
-                      </div>
-                      <div className="text-xs sm:text-lg font-black text-slate-900 group-hover:text-amber-800 mt-1 transition-colors leading-tight break-words">
-                        {student.name || student.studentName}
-                      </div>
-                      <div className="text-[9px] sm:text-xs text-slate-500 mt-0.5">
-                        Std {formatClassNumber(student.className)}
-                      </div>
-                      <div className="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-amber-100 flex items-center justify-center">
-                        <span className="text-xs sm:text-2xl font-black text-amber-800">
-                          {formatScore(student.spr ?? student.overallScore)} pts
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Position 3 in topThree */}
-                {topThree[2] && (() => {
-                  const student = topThree[2];
-                  const rank = student?.rank ?? 3;
-                  const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
-                  const isGold = rank === 1;
-                  const isSilver = rank === 2;
-                  const isBronze = rank === 3;
-                  return (
-                    <div
-                      onClick={() => handleStudentRowClick(student.studentId)}
-                      className={`rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 border-2 shadow-xs cursor-pointer hover:shadow-md transition-all flex flex-col justify-between order-3 text-center group animate-slide-right ${
-                        isGold
-                          ? 'bg-gradient-to-b from-amber-50/90 via-white to-white border-amber-400 -translate-y-2 sm:-translate-y-3'
-                          : isSilver
-                          ? 'bg-white border-slate-200'
-                          : 'bg-white border-amber-200'
-                      }`}
-                    >
-                      <div className="flex justify-center mb-1 sm:mb-2">
-                        <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="lg" className={`w-11 h-11 sm:w-18 sm:h-18 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`} />
-                      </div>
-                      <div className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
-                        isGold
-                          ? 'bg-amber-100 text-amber-700 border-amber-300'
-                          : isSilver
-                          ? 'bg-slate-100/90 text-slate-700 border-slate-200'
-                          : 'bg-amber-100/90 text-amber-800 border-amber-200'
-                      }`}>
-                        ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
-                      </div>
-                      <div className={`text-[10px] sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
-                        isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
-                      }`}>
-                        {student.name || student.studentName}
-                      </div>
-                      <div className="text-[9px] sm:text-xs text-slate-500 mt-0.5">
-                        Std {formatClassNumber(student.className)}
-                      </div>
-                      <div className={`mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t flex items-center justify-center ${
-                        isGold ? 'border-amber-100' : 'border-slate-100'
-                      }`}>
-                        <span className={`text-xs sm:text-lg font-black ${
-                          isGold ? 'text-amber-800' : 'text-slate-800'
+                <div
+                  className={`flex sm:grid ${
+                    filteredEntries.length === 2 ? 'sm:grid-cols-2 max-w-lg' : 'sm:grid-cols-3 max-w-4xl'
+                  } gap-3 sm:gap-4 mx-auto items-end overflow-x-auto sm:overflow-visible horizontal-snap-carousel no-scrollbar pb-3 sm:pb-0 px-1 sm:px-0`}
+                >
+                  {/* Position 2 in topThree (Silver / 2nd Rank) */}
+                  {topThree[1] && (() => {
+                    const student = topThree[1];
+                    const rank = student?.rank ?? 2;
+                    const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
+                    const isGold = rank === 1;
+                    const isSilver = rank === 2;
+                    const isBronze = rank === 3;
+                    return (
+                      <div
+                        onClick={() => handleStudentRowClick(student.studentId)}
+                        className={`w-[78vw] max-w-[280px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item rounded-2xl sm:rounded-3xl p-3 sm:p-5 border-2 shadow-xs cursor-pointer hover:shadow-md transition-all flex flex-col justify-between order-2 sm:order-1 text-center group animate-slide-left ${
+                          isGold
+                            ? 'bg-gradient-to-b from-amber-50/90 via-white to-white border-amber-400 sm:-translate-y-2 lg:-translate-y-3'
+                            : isSilver
+                            ? 'bg-white border-slate-200'
+                            : 'bg-white border-amber-200'
+                        }`}
+                      >
+                        <div className="flex justify-center mb-1 sm:mb-2">
+                          <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="lg" className={`w-12 h-12 sm:w-18 sm:h-18 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`} />
+                        </div>
+                        <div className={`text-[8.5px] sm:text-xs font-black uppercase tracking-widest px-2.5 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
+                          isGold
+                            ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            : isSilver
+                            ? 'bg-slate-100/90 text-slate-700 border-slate-200'
+                            : 'bg-amber-100/90 text-amber-800 border-amber-200'
                         }`}>
-                          {formatScore(student.spr ?? student.overallScore)} pts
-                        </span>
+                          ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
+                        </div>
+                        <div className={`text-xs sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
+                          isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
+                        }`}>
+                          {student.name || student.studentName}
+                        </div>
+                        <div className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
+                          Std {formatClassNumber(student.className)}
+                        </div>
+                        <div className={`mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t flex items-center justify-center ${
+                          isGold ? 'border-amber-100' : 'border-slate-100'
+                        }`}>
+                          <span className={`text-xs sm:text-lg font-black ${
+                            isGold ? 'text-amber-800' : 'text-slate-800'
+                          }`}>
+                            {formatScore(student.spr ?? student.overallScore)} pts
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
+
+                  {/* Position 1 in topThree (Gold / 1st Rank Champion) */}
+                  {topThree[0] && (() => {
+                    const student = topThree[0];
+                    const rank = student?.rank ?? 1;
+                    const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
+                    return (
+                      <div
+                        onClick={() => handleStudentRowClick(student.studentId)}
+                        className="w-[82vw] max-w-[290px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item bg-gradient-to-b from-amber-50/90 via-white to-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-md border-2 border-amber-400 cursor-pointer hover:shadow-xl transition-all flex flex-col justify-between order-1 sm:order-2 sm:-translate-y-2 lg:-translate-y-3 text-center group animate-zoom-up animate-gold-glow"
+                      >
+                        <div className="flex justify-center mb-1 sm:mb-2">
+                          <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="xl" className="w-14 h-14 sm:w-22 sm:h-22 ring-3 sm:ring-4 ring-amber-300/60" />
+                        </div>
+                        <div className="text-[8.5px] sm:text-xs font-black text-amber-700 uppercase tracking-widest bg-amber-100 px-2.5 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border border-amber-300">
+                          ★ {rank === 1 ? '1st' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
+                        </div>
+                        <div className="text-xs sm:text-lg font-black text-slate-900 group-hover:text-amber-800 mt-1 transition-colors leading-tight break-words">
+                          {student.name || student.studentName}
+                        </div>
+                        <div className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
+                          Std {formatClassNumber(student.className)}
+                        </div>
+                        <div className="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-amber-100 flex items-center justify-center">
+                          <span className="text-xs sm:text-2xl font-black text-amber-800">
+                            {formatScore(student.spr ?? student.overallScore)} pts
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Position 3 in topThree (Bronze / 3rd Rank) */}
+                  {topThree[2] && (() => {
+                    const student = topThree[2];
+                    const rank = student?.rank ?? 3;
+                    const isTied = student?.isTied || filteredEntries.filter((s) => s.spr === student?.spr).length > 1;
+                    const isGold = rank === 1;
+                    const isSilver = rank === 2;
+                    const isBronze = rank === 3;
+                    return (
+                      <div
+                        onClick={() => handleStudentRowClick(student.studentId)}
+                        className={`w-[78vw] max-w-[280px] shrink-0 sm:w-auto sm:max-w-none sm:shrink horizontal-snap-item rounded-2xl sm:rounded-3xl p-3 sm:p-5 border-2 shadow-xs cursor-pointer hover:shadow-md transition-all flex flex-col justify-between order-3 sm:order-3 text-center group animate-slide-right ${
+                          isGold
+                            ? 'bg-gradient-to-b from-amber-50/90 via-white to-white border-amber-400 sm:-translate-y-2 lg:-translate-y-3'
+                            : isSilver
+                            ? 'bg-white border-slate-200'
+                            : 'bg-white border-amber-200'
+                        }`}
+                      >
+                        <div className="flex justify-center mb-1 sm:mb-2">
+                          <StudentAvatar photoUrl={student.photoUrl} name={student.name || student.studentName} size="lg" className={`w-12 h-12 sm:w-18 sm:h-18 ${isGold ? 'ring-3 sm:ring-4 ring-amber-300/60' : ''}`} />
+                        </div>
+                        <div className={`text-[8.5px] sm:text-xs font-black uppercase tracking-widest px-2.5 sm:px-3 py-0.5 rounded-full inline-block shadow-2xs border ${
+                          isGold
+                            ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            : isSilver
+                            ? 'bg-slate-100/90 text-slate-700 border-slate-200'
+                            : 'bg-amber-100/90 text-amber-800 border-amber-200'
+                        }`}>
+                          ★ {rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} Rank {isTied ? '(Joint)' : ''} ★
+                        </div>
+                        <div className={`text-xs sm:text-base font-extrabold mt-1 transition-colors leading-tight break-words ${
+                          isGold ? 'text-slate-900 group-hover:text-amber-800' : 'text-slate-900 group-hover:text-blue-600'
+                        }`}>
+                          {student.name || student.studentName}
+                        </div>
+                        <div className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
+                          Std {formatClassNumber(student.className)}
+                        </div>
+                        <div className={`mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t flex items-center justify-center ${
+                          isGold ? 'border-amber-100' : 'border-slate-100'
+                        }`}>
+                          <span className={`text-xs sm:text-lg font-black ${
+                            isGold ? 'text-amber-800' : 'text-slate-800'
+                          }`}>
+                            {formatScore(student.spr ?? student.overallScore)} pts
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             )}
 
@@ -1536,8 +1694,8 @@ function deriveCategoryLeaderboard(
                       <tr
                         key={st.studentId}
                         onClick={() => handleStudentRowClick(st.studentId)}
-                        style={{ animationDelay: `${Math.min(idx * 20, 450)}ms` }}
-                        className={`animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
+                        style={{ animationDelay: `${Math.min(idx * 20, 350)}ms` }}
+                        className={`scroll-driven-row scroll-reveal-target scroll-reveal-hidden animate-row hover:bg-blue-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 group ${
                           isTop1 ? 'bg-amber-50/20 dark:bg-amber-950/10' : ''
                         }`}
                         title={
@@ -1548,7 +1706,7 @@ function deriveCategoryLeaderboard(
                       >
                         <td className="py-2 sm:py-3.5 px-1.5 sm:px-4 text-center">
                           {isTop1 ? (
-                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400 text-amber-950 font-black text-[10px] sm:text-xs shadow-xs">
+                            <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400 text-amber-950 font-black text-[10px] sm:text-xs shadow-xs animate-gold-glow">
                               1
                             </span>
                           ) : isTop2 ? (
@@ -1885,6 +2043,9 @@ function deriveCategoryLeaderboard(
           </div>
         </div>
       )}
+
+      {/* Scroll-Driven Floating Return-to-Top HUD */}
+      <ScrollToTopHUD totalStudents={filteredEntries.length} />
 
       {/* Report Inaccuracy Modal */}
       <StudentReportModal
