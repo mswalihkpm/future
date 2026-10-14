@@ -845,22 +845,10 @@ export default function StudentsPage() {
             <ModalLoadingBar loading={formLoading} text="Saving student profile to database..." color="blue" />
 
             <form onSubmit={handleFormSubmit} className="mt-4 space-y-3.5 flex-1 flex flex-col">
-              {/* Profile Photo Drag & Drop Upload Section */}
-              <div
-                onDragOver={handlePhotoDragOver}
-                onDragEnter={handlePhotoDragOver}
-                onDragLeave={handlePhotoDragLeave}
-                onDrop={handlePhotoDrop}
-                className={`p-4 rounded-2xl border-2 transition-all duration-200 relative ${
-                  isDraggingPhoto
-                    ? 'border-blue-500 bg-blue-50/90 ring-4 ring-blue-100 scale-[1.01]'
-                    : formData.photoUrl
-                    ? 'border-slate-200 bg-slate-50/70 hover:border-slate-300'
-                    : 'border-dashed border-slate-300 bg-slate-50/80 hover:border-blue-400 hover:bg-blue-50/30'
-                }`}
-              >
+              {/* Profile Photo Google Drive URL Section */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  {/* Avatar Preview with Drop Overlay */}
+                  {/* Avatar Preview */}
                   <div className="shrink-0 relative group">
                     <StudentAvatar
                       photoUrl={formData.photoUrl}
@@ -868,84 +856,39 @@ export default function StudentsPage() {
                       size="xl"
                       className="shadow-sm ring-2 ring-white"
                     />
-                    {uploadingPhoto && (
-                      <div className="absolute inset-0 bg-black/50 rounded-full flex flex-col items-center justify-center text-white backdrop-blur-2xs">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      </div>
-                    )}
-                    {isDraggingPhoto && !uploadingPhoto && (
-                      <div className="absolute inset-0 bg-blue-600/80 rounded-full flex items-center justify-center text-white animate-pulse">
-                        <UploadCloud className="w-6 h-6" />
-                      </div>
-                    )}
                   </div>
 
-                  {/* Drop Info and Action Buttons */}
-                  <div className="flex-1 text-center sm:text-left space-y-1">
-                    <div className="flex items-center justify-center sm:justify-start space-x-2">
-                      <label className="text-xs font-bold text-slate-800">Student Profile Photo</label>
-                      {formData.photoUrl && (
+                  {/* Google Drive URL Input */}
+                  <div className="flex-1 w-full space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800">Google Drive Photo URL</label>
+                      {formData.photoUrl ? (
                         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-200">
                           Photo Attached
                         </span>
-                      )}
+                      ) : null}
                     </div>
-                    <p className="text-[11px] text-slate-500">
-                      {isDraggingPhoto
-                        ? '✨ Drop the image file here to upload!'
-                        : 'Drag & drop photo here, or browse from device (JPEG, PNG, WebP).'}
-                    </p>
-
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1.5">
-                      <label
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer shadow-xs transition-all inline-flex items-center space-x-1.5 ${
-                          uploadingPhoto
-                            ? 'bg-blue-400 text-white cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700 active:scale-95 text-white'
-                        }`}
-                      >
-                        {uploadingPhoto ? (
-                          <>
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            <span>Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Camera className="w-3.5 h-3.5" />
-                            <span>{formData.photoUrl ? 'Change / Drop New' : 'Browse / Drop Photo'}</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp,image/jpg"
-                          onChange={handlePhotoUpload}
-                          disabled={uploadingPhoto}
-                          className="hidden"
-                        />
-                      </label>
-
-                      {formData.photoUrl && !uploadingPhoto && (
+                    <input
+                      type="url"
+                      value={formData.photoUrl}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, photoUrl: e.target.value }))}
+                      placeholder="e.g. https://drive.google.com/file/d/... or Google Drive file ID"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-600 transition"
+                    />
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                      <span>Paste sharing link or Google Drive file ID</span>
+                      {formData.photoUrl && (
                         <button
                           type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, photoUrl: '' }))}
-                          className="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/80 transition inline-flex items-center space-x-1"
+                          className="text-rose-600 hover:text-rose-700 font-semibold cursor-pointer transition"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Remove Photo</span>
+                          Clear Photo
                         </button>
                       )}
                     </div>
                   </div>
                 </div>
-
-                {isDraggingPhoto && (
-                  <div className="absolute inset-0 bg-blue-500/10 border-2 border-dashed border-blue-500 rounded-2xl pointer-events-none flex items-center justify-center">
-                    <div className="bg-white px-4 py-2 rounded-xl shadow-lg border border-blue-200 text-blue-700 text-xs font-bold flex items-center space-x-2 animate-bounce">
-                      <UploadCloud className="w-4 h-4 text-blue-600" />
-                      <span>Drop image to attach photo</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div>

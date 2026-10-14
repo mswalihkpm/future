@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { formatGoogleDriveDirectUrl } from '@/lib/google-drive';
 
 interface StudentAvatarProps {
   photoUrl?: string | null;
@@ -17,6 +18,15 @@ const sizeClasses = {
   lg: 'w-12 h-12 text-base',
   xl: 'w-20 h-20 text-xl font-bold',
   '2xl': 'w-24 h-24 text-2xl font-black',
+};
+
+const pixelSizes = {
+  xs: 48,
+  sm: 64,
+  md: 80,
+  lg: 96,
+  xl: 160,
+  '2xl': 200,
 };
 
 const gradientStyles = [
@@ -58,7 +68,9 @@ export function StudentAvatar({
   }
 
   const cleanPhotoUrl = typeof photoUrl === 'string' && photoUrl.trim().length > 0 ? photoUrl.trim() : null;
-  const hasValidPhoto = Boolean(cleanPhotoUrl && !imageError);
+  const targetPixelSize = pixelSizes[size] || 80;
+  const directPhotoUrl = cleanPhotoUrl ? formatGoogleDriveDirectUrl(cleanPhotoUrl, targetPixelSize) : null;
+  const hasValidPhoto = Boolean(directPhotoUrl && !imageError);
 
   return (
     <div
@@ -68,8 +80,10 @@ export function StudentAvatar({
     >
       {hasValidPhoto ? (
         <img
-          src={cleanPhotoUrl!}
+          src={directPhotoUrl!}
           alt={displayName}
+          loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
           crossOrigin="anonymous"
           onError={() => setImageError(true)}
@@ -83,4 +97,3 @@ export function StudentAvatar({
 }
 
 export default StudentAvatar;
-

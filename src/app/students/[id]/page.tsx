@@ -47,31 +47,20 @@ export default function StudentProfilePage() {
   const [creativeWorks, setCreativeWorks] = useState<any[]>(cachedData?.creativeWorks || []);
   const [libraryRecords, setLibraryRecords] = useState<any[]>(cachedData?.libraryRecords || []);
   const [activeTab, setActiveTab] = useState<string>('OVERVIEW');
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [inputPhotoUrl, setInputPhotoUrl] = useState('');
+  const [savingPhoto, setSavingPhoto] = useState(false);
   const [selectedCatDetails, setSelectedCatDetails] = useState<any | null>(null);
 
-  const handlePhotoFile = async (file: File) => {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('Please select or drop a valid image file (JPEG, PNG, WebP).');
-      return;
-    }
+  const handleOpenPhotoModal = () => {
+    setInputPhotoUrl(profileData?.student?.photoUrl || '');
+    setPhotoModalOpen(true);
+  };
 
+  const handleSavePhotoUrl = async () => {
     try {
-      setUploadingPhoto(true);
-      const compressedDataUrl = await compressImageClientSide(file, 360, 0.85);
-
-      // Upload image
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: compressedDataUrl }),
-      });
-      const json = await res.json();
-      const finalUrl = json.url || compressedDataUrl;
-
-      // Update student profile photo in DB
+      setSavingPhoto(true);
+      const finalUrl = inputPhotoUrl.trim();
       const updateRes = await fetch(`/api/students/${studentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -84,22 +73,21 @@ export default function StudentProfilePage() {
         ...prev,
         student: {
           ...prev?.student,
-          photoUrl: finalUrl,
+          photoUrl: finalUrl || null,
         },
       }));
+      setPhotoModalOpen(false);
     } catch (err: any) {
-      console.error('Photo update error:', err);
       alert(err.message || 'Error updating photo.');
     } finally {
-      setUploadingPhoto(false);
+      setSavingPhoto(false);
     }
   };
 
-  const handleRemovePhoto = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRemovePhoto = async () => {
     if (!confirm('Are you sure you want to remove this profile photo?')) return;
     try {
-      setUploadingPhoto(true);
+      setSavingPhoto(true);
       const updateRes = await fetch(`/api/students/${studentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -114,32 +102,12 @@ export default function StudentProfilePage() {
           photoUrl: null,
         },
       }));
+      setInputPhotoUrl('');
+      setPhotoModalOpen(false);
     } catch (err: any) {
       alert(err.message || 'Error removing photo.');
     } finally {
-      setUploadingPhoto(false);
-    }
-  };
-
-  const handlePhotoDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isDraggingPhoto) setIsDraggingPhoto(true);
-  };
-
-  const handlePhotoDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingPhoto(false);
-  };
-
-  const handlePhotoDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingPhoto(false);
-    const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
-      await handlePhotoFile(droppedFile);
+      setSavingPhoto(false);
     }
   };
 
@@ -240,73 +208,22 @@ export default function StudentProfilePage() {
             {/* Student Info with Drag & Drop Avatar */}
             <div className="flex items-center space-x-4 sm:space-x-6">
               <div
-                onDragOver={handlePhotoDragOver}
-                onDragEnter={handlePhotoDragOver}
-                onDragLeave={handlePhotoDragLeave}
-                onDrop={handlePhotoDrop}
-                className="relative group shrink-0"
-                title="Drag & drop a photo here to update, or click camera icon"
+                onClick={handleOpenPhotoModal}
+                className="relative group shrink-0 cursor-pointer"
+                title="Click to update Google Drive photo"
               >
                 <StudentAvatar
                   photoUrl={student.photoUrl}
                   name={student.fullName}
                   size="2xl"
-                  className={`ring-4 transition-all duration-200 ${
-                    isDraggingPhoto
-                      ? 'ring-blue-400 scale-105 shadow-lg shadow-blue-500/50'
-                      : 'ring-white/20 group-hover:ring-blue-400/80'
-                  }`}
+                  className="ring-4 ring-white/20 group-hover:ring-blue-400 transition-all duration-200"
                 />
 
-                {/* Uploading Overlay */}
-                {uploadingPhoto && (
-                  <div className="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center text-white backdrop-blur-2xs">
-                    <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
-                    <span className="text-[9px] font-bold mt-1">Saving...</span>
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-2xs">
+                  <div className="p-2 rounded-full bg-blue-600 text-white shadow-lg">
+                    <Camera className="w-4 h-4" />
                   </div>
-                )}
-
-                {/* Dragging Active Overlay */}
-                {isDraggingPhoto && !uploadingPhoto && (
-                  <div className="absolute inset-0 bg-blue-600/90 rounded-full flex flex-col items-center justify-center text-white animate-pulse">
-                    <UploadCloud className="w-8 h-8" />
-                    <span className="text-[9px] font-extrabold mt-0.5">Drop Here</span>
-                  </div>
-                )}
-
-                {/* Hover action overlay & buttons */}
-                {!uploadingPhoto && !isDraggingPhoto && (
-                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 backdrop-blur-2xs">
-                    <label
-                      className="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white cursor-pointer shadow-lg transition active:scale-90"
-                      title="Upload or Drop new photo"
-                    >
-                      <Camera className="w-4 h-4" />
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/jpg"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            e.target.value = '';
-                            handlePhotoFile(file);
-                          }
-                        }}
-                        className="hidden"
-                      />
-                    </label>
-                    {student.photoUrl && (
-                      <button
-                        type="button"
-                        onClick={handleRemovePhoto}
-                        className="p-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition active:scale-90"
-                        title="Drop / Delete photo"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                )}
+                </div>
               </div>
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -837,6 +754,92 @@ export default function StudentProfilePage() {
                 >
                   Close
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Update Google Drive Photo Modal */}
+        {photoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-scale-in space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">Student Profile Photo</h3>
+                    <p className="text-[11px] text-slate-500">Google Drive URL Integration</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPhotoModalOpen(false)}
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Avatar Preview */}
+              <div className="flex flex-col items-center justify-center py-2 space-y-2">
+                <StudentAvatar
+                  photoUrl={inputPhotoUrl}
+                  name={student?.fullName}
+                  size="2xl"
+                  className="ring-4 ring-slate-100 shadow-md"
+                />
+                <span className="text-[11px] font-semibold text-slate-600">
+                  {inputPhotoUrl ? 'Live Preview from Google CDN' : 'Default Initials Avatar'}
+                </span>
+              </div>
+
+              {/* URL Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Google Drive Photo URL / Sharing Link</label>
+                <input
+                  type="url"
+                  value={inputPhotoUrl}
+                  onChange={(e) => setInputPhotoUrl(e.target.value)}
+                  placeholder="https://drive.google.com/file/d/... or File ID"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-600 transition"
+                />
+                <p className="text-[10px] text-slate-400 leading-relaxed">
+                  Paste the Google Drive sharing link or file ID. The SPR system automatically optimizes and serves the photo directly from Google&apos;s edge CDN without consuming Supabase bandwidth.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                {student?.photoUrl ? (
+                  <button
+                    type="button"
+                    disabled={savingPhoto}
+                    onClick={handleRemovePhoto}
+                    className="px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                  >
+                    Remove Photo
+                  </button>
+                ) : <div />}
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    disabled={savingPhoto}
+                    onClick={() => setPhotoModalOpen(false)}
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={savingPhoto}
+                    onClick={handleSavePhotoUrl}
+                    className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition disabled:opacity-50"
+                  >
+                    {savingPhoto ? 'Saving...' : 'Save Photo URL'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
