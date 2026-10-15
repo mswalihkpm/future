@@ -2,7 +2,7 @@
 
 **Database Target**: Lovable Cloud (Supabase Managed PostgreSQL)  
 **Safety Protocol**: Strictly Non-Destructive, Additive-Only Evolution  
-**Principle**: Zero Data Loss, Backward Compatibility, Reversible Operations  
+**Principle**: Zero Data Loss, Backward Compatibility, Reversible Operations
 
 ---
 
@@ -19,6 +19,7 @@ No existing records will be deleted.
 ## 2. Phased Migration Stages
 
 ### Stage 1: Core Master Data Expansion (Safe & Additive)
+
 - **Table Alterations**:
   - `students`: Add columns `institutional_id text`, `division text`, `notes text`, `status text not null default 'ACTIVE'`.
 - **New Tables**:
@@ -30,6 +31,7 @@ No existing records will be deleted.
   - `academic_exam_marks`: Itemized marks per student, exam, and subject.
 
 ### Stage 2: Specialized Category Registries
+
 - **Literary & Competitions**:
   - `literary_events`: Events such as `Sahityotsav`, `Jamia Maharjan`, `M-Lit Fest`, `Kerala School Kalotsav` linked to academic year.
   - `literary_competitions`: Competitions within events with level (`Campus`, `School`, `Division`, `District`, `Da'eera`, `State`, `National`, `International`).
@@ -46,6 +48,7 @@ No existing records will be deleted.
   - `library_reading_records`: Sync records matched by **exact SPR Student ID only**.
 
 ### Stage 3: Operational & Public Communication Tables
+
 - `news_articles`: Updates, image URLs, publication status.
 - `student_issue_reports`: Public inaccuracy reports with status (`PENDING`, `REVIEWED`, `RESOLVED`) and private admin notes.
 - `audit_logs`: Traceable sensitive action logs.
@@ -53,6 +56,7 @@ No existing records will be deleted.
 - `scoring_rules`: Configurable prize multipliers, level multipliers, and base scores.
 
 ### Stage 4: Scoring Views Evolution
+
 - Update `student_category_scores` and `student_spr` views to mirror the pure **unlimited numerical points model**:
   - Sum of earned points across all active categories.
   - RLS policies allowing public anonymous read for leaderboard/public profile projections while restricting private student notes and reporter identities.
@@ -60,6 +64,7 @@ No existing records will be deleted.
 ---
 
 ## 3. Rollback & Recovery Plan
+
 - Every migration step is versioned and applied incrementally.
 - Views can be recreated without data migration.
 - Additive columns have safe defaults (`null` or default values) to prevent breaking existing queries.

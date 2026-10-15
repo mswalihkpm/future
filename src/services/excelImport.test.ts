@@ -12,7 +12,13 @@ describe("Excel Student Import & Validation", () => {
     { id: "c1", name: "Class 8", section: "A", institution_id: "i1", academic_year_id: "y1" },
     { id: "c2", name: "Class 8", section: "B", institution_id: "i1", academic_year_id: "y1" },
     { id: "c3", name: "Class 9", section: "A", institution_id: "i1", academic_year_id: "y1" },
-    { id: "c4", name: "Class +1", section: "Science", institution_id: "i1", academic_year_id: "y1" },
+    {
+      id: "c4",
+      name: "Class +1",
+      section: "Science",
+      institution_id: "i1",
+      academic_year_id: "y1",
+    },
   ];
 
   const mockHouses: HouseOption[] = [
@@ -61,9 +67,7 @@ describe("Excel Student Import & Validation", () => {
 
   describe("Row Validation & Error Detection", () => {
     it("detects missing student name as ERROR", () => {
-      const rows: RawImportRow[] = [
-        { "Student Name": "", Class: "Class 8 A" },
-      ];
+      const rows: RawImportRow[] = [{ "Student Name": "", Class: "Class 8 A" }];
       const result = validateStudentImportData(rows, context);
       expect(result.errorCount).toBe(1);
       expect(result.canCommit).toBe(false);
@@ -71,9 +75,7 @@ describe("Excel Student Import & Validation", () => {
     });
 
     it("detects unmapped class as ERROR", () => {
-      const rows: RawImportRow[] = [
-        { "Student Name": "Rashid", Class: "Unknown Class 99" },
-      ];
+      const rows: RawImportRow[] = [{ "Student Name": "Rashid", Class: "Unknown Class 99" }];
       const result = validateStudentImportData(rows, context);
       expect(result.errorCount).toBe(1);
       expect(result.canCommit).toBe(false);
@@ -111,7 +113,9 @@ describe("Excel Student Import & Validation", () => {
       ];
       const result = validateStudentImportData(rows, context);
       expect(result.errorCount).toBe(1);
-      expect(result.rows[1]?.issues[0]?.message).toMatch(/found multiple times in this import file/);
+      expect(result.rows[1]?.issues[0]?.message).toMatch(
+        /found multiple times in this import file/,
+      );
       expect(result.canCommit).toBe(false);
     });
 
@@ -139,7 +143,9 @@ describe("Excel Student Import & Validation", () => {
       ];
       const result = validateStudentImportData(rows, context);
       expect(result.errorCount).toBe(0);
-      expect(result.rows[0]?.photoUrl).toBe("https://lh3.googleusercontent.com/d/testFileId123=s360");
+      expect(result.rows[0]?.photoUrl).toBe(
+        "https://lh3.googleusercontent.com/d/testFileId123=s360",
+      );
       expect(result.canCommit).toBe(true);
     });
 

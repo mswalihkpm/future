@@ -1,6 +1,6 @@
 /**
  * SPR Calculation Module
- * 
+ *
  * Re-exports the authoritative unlimited numerical points scoring engine
  * from `./scoring`, while providing backward-compatible adapters.
  */

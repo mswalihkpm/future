@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  extractGoogleDriveFileId,
-  normalizePhotoUrl,
-  validatePhotoUrl,
-} from "./media";
+import { extractGoogleDriveFileId, normalizePhotoUrl, validatePhotoUrl } from "./media";
 
 describe("Media and Photo URL Handler", () => {
   it("extracts file ID from Google Drive sharing link", () => {
@@ -23,8 +19,11 @@ describe("Media and Photo URL Handler", () => {
   });
 
   it("strictly rejects Base64 image payloads with an error", () => {
-    const base64Data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-    expect(() => normalizePhotoUrl(base64Data)).toThrow(/Base64 photo storage is strictly prohibited/);
+    const base64Data =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+    expect(() => normalizePhotoUrl(base64Data)).toThrow(
+      /Base64 photo storage is strictly prohibited/,
+    );
   });
 
   it("passes through standard external CDN URLs untouched", () => {

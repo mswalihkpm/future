@@ -1,6 +1,6 @@
 /**
  * Media and Student Photo Handling
- * 
+ *
  * Rules:
  * 1. Never store Base64 images in database rows.
  * 2. Convert Google Drive share URLs to direct CDN thumbnail URLs:
@@ -34,7 +34,9 @@ export function extractGoogleDriveFileId(url: string): string | null {
   if (fileDMatch && fileDMatch[1]) return fileDMatch[1];
 
   // Pattern 2: drive.google.com/(open|uc|thumbnail)?id={ID}
-  const idParamMatch = trimmed.match(/drive\.google\.com\/(?:open|uc|thumbnail|file)\?[^#]*\bid=([a-zA-Z0-9_-]+)/);
+  const idParamMatch = trimmed.match(
+    /drive\.google\.com\/(?:open|uc|thumbnail|file)\?[^#]*\bid=([a-zA-Z0-9_-]+)/,
+  );
   if (idParamMatch && idParamMatch[1]) return idParamMatch[1];
 
   // Pattern 3: lh3.googleusercontent.com/d/{ID}
@@ -57,7 +59,7 @@ export function normalizePhotoUrl(rawUrl: string | null | undefined): string | n
 
   if (BASE64_IMAGE_PREFIX.test(trimmed)) {
     throw new Error(
-      "Base64 photo storage is strictly prohibited. Please provide a direct image URL or Google Drive link."
+      "Base64 photo storage is strictly prohibited. Please provide a direct image URL or Google Drive link.",
     );
   }
 

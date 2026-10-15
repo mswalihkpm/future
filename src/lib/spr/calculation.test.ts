@@ -8,7 +8,12 @@ const cats = [
 
 describe("calculateSpr", () => {
   it("is exactly 100 for perfect scores", () => {
-    expect(calculateSpr(cats, cats.map((c) => ({ categoryId: c.id, normalizedScore: 1 })))).toBe(100);
+    expect(
+      calculateSpr(
+        cats,
+        cats.map((c) => ({ categoryId: c.id, normalizedScore: 1 })),
+      ),
+    ).toBe(100);
   });
   it("weights Islamic Studies at 20%", () => {
     expect(calculateSpr(cats, [{ categoryId: "islamic", normalizedScore: 1 }])).toBeCloseTo(20, 10);

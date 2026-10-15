@@ -34,12 +34,7 @@ interface StudentFormDialogProps {
   onSuccess: () => void;
 }
 
-const STUDENT_TYPES = [
-  "Day Scholar",
-  "Residential / Boarder",
-  "Hifz Stream",
-  "General",
-];
+const STUDENT_TYPES = ["Day Scholar", "Residential / Boarder", "Hifz Stream", "General"];
 
 export function StudentFormDialog({
   open,
@@ -170,7 +165,10 @@ export function StudentFormDialog({
           <div className="rounded-lg border bg-muted/40 p-3">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="spr_id" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Label
+                  htmlFor="spr_id"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                >
                   Permanent SPR Student ID
                 </Label>
                 <div className="mt-1 flex items-center gap-2">
@@ -214,7 +212,9 @@ export function StudentFormDialog({
           {/* Full Name & Father Name */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
+              <Label htmlFor="fullName">
+                Full Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="fullName"
                 value={fullName}
@@ -332,7 +332,8 @@ export function StudentFormDialog({
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Images are loaded directly from external CDNs. Base64 blobs are strictly prohibited in database rows.
+              Images are loaded directly from external CDNs. Base64 blobs are strictly prohibited in
+              database rows.
             </p>
           </div>
 

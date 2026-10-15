@@ -67,9 +67,9 @@ export function downloadStudentImportTemplate(filename = "SPR_Student_Import_Tem
   const sampleData = [
     {
       "Student Name": "Ahmad Rayan",
-      "Class": "Class 8 A",
-      "Institution": "Ma'din School of Excellence",
-      "House": "Emerald",
+      Class: "Class 8 A",
+      Institution: "Ma'din School of Excellence",
+      House: "Emerald",
       "Father Name": "Muhammad Ali",
       "Date of Birth": "2010-04-15",
       "Student Type": "Day Scholar",
@@ -78,9 +78,9 @@ export function downloadStudentImportTemplate(filename = "SPR_Student_Import_Tem
     },
     {
       "Student Name": "Ibrahim Fawaz",
-      "Class": "Class 9 B",
-      "Institution": "Ma'din School of Excellence",
-      "House": "Ruby",
+      Class: "Class 9 B",
+      Institution: "Ma'din School of Excellence",
+      House: "Ruby",
       "Father Name": "Abdul Gafoor",
       "Date of Birth": "2009-11-20",
       "Student Type": "Residential",
@@ -89,9 +89,9 @@ export function downloadStudentImportTemplate(filename = "SPR_Student_Import_Tem
     },
     {
       "Student Name": "Bilal Mansoor",
-      "Class": "Class 10 A",
-      "Institution": "Ma'din School of Excellence",
-      "House": "Sapphire",
+      Class: "Class 10 A",
+      Institution: "Ma'din School of Excellence",
+      House: "Sapphire",
       "Father Name": "Mansoor K",
       "Date of Birth": "2008-08-05",
       "Student Type": "Day Scholar",
@@ -139,7 +139,9 @@ export function findMatchingClass(raw: string, classes: ClassOption[]): ClassOpt
 
   // 3. Compact representation like "8A" -> "Class 8" + "A"
   for (const c of classes) {
-    const compact = `${c.name.replace(/class/i, "").trim()}${c.section ?? ""}`.toLowerCase().replace(/\s+/g, "");
+    const compact = `${c.name.replace(/class/i, "").trim()}${c.section ?? ""}`
+      .toLowerCase()
+      .replace(/\s+/g, "");
     const testClean = clean.replace(/class/i, "").trim().replace(/\s+/g, "");
     if (testClean === compact) return c;
   }
@@ -166,14 +168,14 @@ export function validateStudentImportData(
     classes: ClassOption[];
     houses: HouseOption[];
     institutions: InstitutionOption[];
-  }
+  },
 ): ImportValidationResult {
   const rows: ValidatedImportRow[] = [];
   const seenSprIdsInBatch = new Set<string>();
   const seenStudentClassPairs = new Set<string>();
 
   // Determine starting point for sequential SPR IDs
-  let currentGeneratedIds = [...context.existingSprIds];
+  const currentGeneratedIds = [...context.existingSprIds];
 
   rawData.forEach((raw, idx) => {
     const rowNumber = idx + 2; // Excel row index (header is row 1)
@@ -183,7 +185,11 @@ export function validateStudentImportData(
     const nameField = raw["Student Name"] ?? raw["Full Name"] ?? raw.Name;
     const fullName = (nameField ?? "").toString().trim();
     if (!fullName) {
-      issues.push({ field: "Student Name", message: "Student Name is required.", severity: "ERROR" });
+      issues.push({
+        field: "Student Name",
+        message: "Student Name is required.",
+        severity: "ERROR",
+      });
     }
 
     // 2. Class Validation
@@ -271,7 +277,9 @@ export function validateStudentImportData(
       if (!photoVal.valid) {
         issues.push({
           field: "Photo URL",
-          message: photoVal.error ?? "Invalid photo URL. Base64 is prohibited; use a direct image URL or Google Drive link.",
+          message:
+            photoVal.error ??
+            "Invalid photo URL. Base64 is prohibited; use a direct image URL or Google Drive link.",
           severity: "ERROR",
         });
       } else {
@@ -327,7 +335,9 @@ export function validateStudentImportData(
       isAutoSprId: isAuto,
       rawClassName: classField,
       matchedClassId: matchedClass?.id ?? null,
-      matchedClassName: matchedClass ? `${matchedClass.name}${matchedClass.section ? ` ${matchedClass.section}` : ""}` : classField,
+      matchedClassName: matchedClass
+        ? `${matchedClass.name}${matchedClass.section ? ` ${matchedClass.section}` : ""}`
+        : classField,
       rawHouseName: rawHouse,
       matchedHouseId: matchedHouse?.id ?? null,
       rawInstitutionName,
@@ -364,7 +374,7 @@ export async function parseAndValidateStudentExcel(
     classes: ClassOption[];
     houses: HouseOption[];
     institutions: InstitutionOption[];
-  }
+  },
 ): Promise<ImportValidationResult> {
   const workbook = XLSX.read(fileBuffer, { type: "array", cellDates: true });
   const sheetName = workbook.SheetNames[0];
@@ -384,7 +394,7 @@ export async function parseAndValidateStudentExcel(
  * Commits verified rows to the students table in Supabase
  */
 export async function commitStudentImport(
-  validRows: ValidatedImportRow[]
+  validRows: ValidatedImportRow[],
 ): Promise<{ successCount: number; errors: string[] }> {
   const errors: string[] = [];
   let successCount = 0;

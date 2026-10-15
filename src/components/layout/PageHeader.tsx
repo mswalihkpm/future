@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 
-export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
   return (
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
@@ -14,7 +22,10 @@ export function PageHeader({ title, description, actions }: { title: string; des
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+    <div
+      role="alert"
+      className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive"
+    >
       {message}
     </div>
   );

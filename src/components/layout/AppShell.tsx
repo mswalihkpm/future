@@ -2,8 +2,19 @@ import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { GraduationCap, LogOut } from "lucide-react";
 import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { MODULES, MODULE_GROUPS, type AppModule } from "@/lib/modules";
@@ -70,7 +81,12 @@ export function AppShell() {
             <p className="truncate font-medium">{user?.email}</p>
             <p className="capitalize opacity-70">{user?.roles.join(", ") || "No role assigned"}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
+            className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
             <LogOut className="size-4" /> Sign out
           </Button>
         </SidebarFooter>
@@ -92,7 +108,9 @@ function NoRoleNotice() {
   return (
     <div className="surface-card p-8 text-center">
       <h1 className="text-2xl font-semibold">Awaiting access</h1>
-      <p className="mt-2 text-muted-foreground">Your account is active, but an administrator still needs to assign you a role.</p>
+      <p className="mt-2 text-muted-foreground">
+        Your account is active, but an administrator still needs to assign you a role.
+      </p>
     </div>
   );
 }

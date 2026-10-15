@@ -10,7 +10,12 @@ import { effectiveShare, formatPercent } from "@/lib/spr/calculation";
 import { MODULES } from "@/lib/modules";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — SPR" }, { name: "description", content: "SPR admin dashboard overview." }] }),
+  head: () => ({
+    meta: [
+      { title: "Dashboard — SPR" },
+      { name: "description", content: "SPR admin dashboard overview." },
+    ],
+  }),
   component: Dashboard,
 });
 
@@ -30,7 +35,11 @@ function Dashboard() {
     <>
       <PageHeader
         title="Dashboard"
-        description={stats.data?.currentYear ? `Academic year ${stats.data.currentYear}` : "No current academic year set yet"}
+        description={
+          stats.data?.currentYear
+            ? `Academic year ${stats.data.currentYear}`
+            : "No current academic year set yet"
+        }
       />
       {stats.error && <ErrorState message="Couldn't load statistics. Please try again." />}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -40,7 +49,11 @@ function Dashboard() {
               <span className="text-sm">{t.label}</span>
               <t.icon className="size-4" />
             </div>
-            {stats.isLoading ? <Skeleton className="mt-3 h-8 w-16" /> : <p className="mt-2 font-display text-3xl font-semibold">{t.value ?? 0}</p>}
+            {stats.isLoading ? (
+              <Skeleton className="mt-3 h-8 w-16" />
+            ) : (
+              <p className="mt-2 font-display text-3xl font-semibold">{t.value ?? 0}</p>
+            )}
           </div>
         ))}
       </div>
@@ -48,7 +61,9 @@ function Dashboard() {
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         <section className="surface-card p-6 lg:col-span-3">
           <h2 className="text-xl font-semibold">SPR weight distribution</h2>
-          <p className="mb-5 text-sm text-muted-foreground">Final SPR = weighted average of normalized category scores (max 100%).</p>
+          <p className="mb-5 text-sm text-muted-foreground">
+            Final SPR = weighted average of normalized category scores (max 100%).
+          </p>
           {cats.isLoading && <Skeleton className="h-48 w-full" />}
           {cats.error && <ErrorState message="Couldn't load categories." />}
           <ul className="space-y-3">
@@ -58,10 +73,17 @@ function Dashboard() {
                 <li key={c.id}>
                   <div className="mb-1 flex justify-between text-sm">
                     <span className="font-medium">{c.name}</span>
-                    <span className="tabular-nums text-muted-foreground">{formatPercent(share)}</span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {formatPercent(share)}
+                    </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-muted">
-                    <div className={c.code === "islamic_studies" ? "h-full bg-gold" : "h-full bg-primary"} style={{ width: `${share}%` }} />
+                    <div
+                      className={
+                        c.code === "islamic_studies" ? "h-full bg-gold" : "h-full bg-primary"
+                      }
+                      style={{ width: `${share}%` }}
+                    />
                   </div>
                 </li>
               );
@@ -71,7 +93,9 @@ function Dashboard() {
 
         <section className="surface-card p-6 lg:col-span-2">
           <h2 className="text-xl font-semibold">Modules</h2>
-          <p className="mb-4 text-sm text-muted-foreground">Phase 1 foundation — more modules are on the way.</p>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Phase 1 foundation — more modules are on the way.
+          </p>
           <ul className="divide-y">
             {MODULES.filter((m) => m.slug !== "dashboard").map((m) => (
               <li key={m.slug}>
@@ -83,7 +107,9 @@ function Dashboard() {
                 >
                   <m.icon className="size-4 text-muted-foreground" />
                   <span className="flex-1">{m.title}</span>
-                  <Badge variant={m.status === "ready" ? "default" : "secondary"}>{m.status === "ready" ? "Available" : "Planned"}</Badge>
+                  <Badge variant={m.status === "ready" ? "default" : "secondary"}>
+                    {m.status === "ready" ? "Available" : "Planned"}
+                  </Badge>
                 </Link>
               </li>
             ))}

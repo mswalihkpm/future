@@ -78,7 +78,7 @@ export async function listStudents({
     .from("students")
     .select(
       "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)",
-      { count: "exact" }
+      { count: "exact" },
     );
 
   // Search filter
@@ -103,7 +103,8 @@ export async function listStudents({
   }
 
   // Sorting
-  const sortColumn = sortBy === "spr_id" ? "spr_id" : sortBy === "created_at" ? "created_at" : "full_name";
+  const sortColumn =
+    sortBy === "spr_id" ? "spr_id" : sortBy === "created_at" ? "created_at" : "full_name";
   query = query.order(sortColumn, { ascending: sortOrder === "asc" });
 
   // Pagination
@@ -127,7 +128,7 @@ export async function getStudentById(id: string): Promise<StudentRow | null> {
   const { data, error } = await supabase
     .from("students")
     .select(
-      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)"
+      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -192,7 +193,7 @@ export async function createStudent(input: CreateStudentInput): Promise<StudentR
       is_active: input.is_active ?? true,
     })
     .select(
-      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)"
+      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)",
     )
     .single();
 
@@ -225,7 +226,7 @@ export async function updateStudent(id: string, input: UpdateStudentInput): Prom
     .update(updates)
     .eq("id", id)
     .select(
-      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)"
+      "id, spr_id, full_name, father_name, date_of_birth, student_type, photo_url, is_active, class_id, house_id, class:classes(id, name, section, institution:institutions(name, code)), house:houses(id, name)",
     )
     .single();
 
@@ -237,27 +238,27 @@ export async function updateStudent(id: string, input: UpdateStudentInput): Prom
  * Toggles student active/inactive status
  */
 export async function toggleStudentStatus(id: string, isActive: boolean): Promise<void> {
-  const { error } = await supabase
-    .from("students")
-    .update({ is_active: isActive })
-    .eq("id", id);
+  const { error } = await supabase.from("students").update({ is_active: isActive }).eq("id", id);
   if (error) throw error;
 }
 
 /**
  * Generates an XLSX file containing the student records and triggers a browser download
  */
-export function exportStudentsToExcel(students: StudentRow[], filename = "SPR_Student_Registry.xlsx") {
+export function exportStudentsToExcel(
+  students: StudentRow[],
+  filename = "SPR_Student_Registry.xlsx",
+) {
   const exportRows = students.map((s) => ({
     "SPR ID": s.spr_id,
     "Full Name": s.full_name,
-    "Class": s.class ? `${s.class.name}${s.class.section ? ` ${s.class.section}` : ""}` : "",
-    "Institution": s.class?.institution?.name || "Ma'din School of Excellence",
-    "House": s.house?.name || "",
+    Class: s.class ? `${s.class.name}${s.class.section ? ` ${s.class.section}` : ""}` : "",
+    Institution: s.class?.institution?.name || "Ma'din School of Excellence",
+    House: s.house?.name || "",
     "Father Name": s.father_name || "",
     "Date of Birth": s.date_of_birth || "",
     "Student Type": s.student_type || "",
-    "Status": s.is_active ? "Active" : "Inactive",
+    Status: s.is_active ? "Active" : "Inactive",
     "Photo URL": s.photo_url || "",
   }));
 

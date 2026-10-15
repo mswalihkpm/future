@@ -46,7 +46,9 @@ describe("Student Registry Business Rules & Invariance", () => {
 
     it("strictly blocks Base64 image blobs to prevent PostgreSQL row payload bloat", () => {
       const base64Data = "data:image/jpeg;base64,/9j/4AAQSkZJRg==";
-      expect(() => normalizePhotoUrl(base64Data)).toThrow(/Base64 photo storage is strictly prohibited/);
+      expect(() => normalizePhotoUrl(base64Data)).toThrow(
+        /Base64 photo storage is strictly prohibited/,
+      );
     });
 
     it("allows valid external CDN image URLs", () => {
@@ -71,7 +73,7 @@ describe("Student Registry Business Rules & Invariance", () => {
       const matchExternalStudent = (
         recordSprId: string | undefined,
         _studentName: string,
-        systemCohort: Array<{ sprId: string; name: string }>
+        systemCohort: Array<{ sprId: string; name: string }>,
       ) => {
         if (!recordSprId) return null; // Reject name matching
         const norm = normalizeSprId(recordSprId);

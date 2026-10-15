@@ -38,15 +38,13 @@ describe("Authoritative SPR Scoring Engine", () => {
     });
 
     it("handles zero maximum marks safely", () => {
-      expect(
-        calculateExamScaledScore({ sumObtained: 0, sumMax: 0, actualMaxScore: 100 })
-      ).toBe(0);
+      expect(calculateExamScaledScore({ sumObtained: 0, sumMax: 0, actualMaxScore: 100 })).toBe(0);
     });
 
     it("clamps obtained marks if exceeding max marks", () => {
-      expect(
-        calculateExamScaledScore({ sumObtained: 120, sumMax: 100, actualMaxScore: 100 })
-      ).toBe(100);
+      expect(calculateExamScaledScore({ sumObtained: 120, sumMax: 100, actualMaxScore: 100 })).toBe(
+        100,
+      );
     });
   });
 

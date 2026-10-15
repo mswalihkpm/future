@@ -66,7 +66,10 @@ export const Route = createFileRoute("/_authenticated/students")({
   head: () => ({
     meta: [
       { title: "Student Registry — SPR" },
-      { name: "description", content: "Student registry with permanent sequential SPR IDs and performance ratings." },
+      {
+        name: "description",
+        content: "Student registry with permanent sequential SPR IDs and performance ratings.",
+      },
     ],
   }),
   component: StudentsPage,
@@ -104,7 +107,10 @@ function StudentsPage() {
   // Master data queries
   const classesQuery = useQuery({ queryKey: ["classes"], queryFn: () => listClasses() });
   const housesQuery = useQuery({ queryKey: ["houses"], queryFn: () => listHouses() });
-  const institutionsQuery = useQuery({ queryKey: ["institutions"], queryFn: () => listInstitutions() });
+  const institutionsQuery = useQuery({
+    queryKey: ["institutions"],
+    queryFn: () => listInstitutions(),
+  });
 
   // Students query
   const studentsQuery = useQuery({
@@ -142,7 +148,9 @@ function StudentsPage() {
   async function handleToggleStatus(student: StudentRow) {
     try {
       await toggleStudentStatus(student.id, !student.is_active);
-      toast.success(`Student ${student.full_name} is now ${!student.is_active ? "Active" : "Inactive"}.`);
+      toast.success(
+        `Student ${student.full_name} is now ${!student.is_active ? "Active" : "Inactive"}.`,
+      );
       queryClient.invalidateQueries({ queryKey: ["students"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to toggle status.");
@@ -225,7 +233,13 @@ function StudentsPage() {
 
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {/* Class filter */}
-            <Select value={classFilter} onValueChange={(v) => { setClassFilter(v); setPage(1); }}>
+            <Select
+              value={classFilter}
+              onValueChange={(v) => {
+                setClassFilter(v);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-36 text-xs">
                 <SelectValue placeholder="All Classes" />
               </SelectTrigger>
@@ -240,7 +254,13 @@ function StudentsPage() {
             </Select>
 
             {/* House filter */}
-            <Select value={houseFilter} onValueChange={(v) => { setHouseFilter(v); setPage(1); }}>
+            <Select
+              value={houseFilter}
+              onValueChange={(v) => {
+                setHouseFilter(v);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-32 text-xs">
                 <SelectValue placeholder="All Houses" />
               </SelectTrigger>
@@ -257,7 +277,10 @@ function StudentsPage() {
             {/* Status filter */}
             <Select
               value={statusFilter}
-              onValueChange={(v: "all" | "active" | "inactive") => { setStatusFilter(v); setPage(1); }}
+              onValueChange={(v: "all" | "active" | "inactive") => {
+                setStatusFilter(v);
+                setPage(1);
+              }}
             >
               <SelectTrigger className="w-28 text-xs">
                 <SelectValue placeholder="Status" />
@@ -273,7 +296,10 @@ function StudentsPage() {
             <Select
               value={`${sortBy}-${sortOrder}`}
               onValueChange={(val) => {
-                const [col, ord] = val.split("-") as ["name" | "spr_id" | "created_at", "asc" | "desc"];
+                const [col, ord] = val.split("-") as [
+                  "name" | "spr_id" | "created_at",
+                  "asc" | "desc",
+                ];
                 setSortBy(col);
                 setSortOrder(ord);
               }}
@@ -290,7 +316,10 @@ function StudentsPage() {
               </SelectContent>
             </Select>
 
-            {(search || classFilter !== "all" || houseFilter !== "all" || statusFilter !== "all") && (
+            {(search ||
+              classFilter !== "all" ||
+              houseFilter !== "all" ||
+              statusFilter !== "all") && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -337,35 +366,49 @@ function StudentsPage() {
                 {studentsQuery.isLoading &&
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="size-8 rounded-full" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                      <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-14 rounded-full" /></TableCell>
-                      {canManage && <TableCell><Skeleton className="size-6 ml-auto" /></TableCell>}
+                      <TableCell>
+                        <Skeleton className="size-8 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-14 rounded-full" />
+                      </TableCell>
+                      {canManage && (
+                        <TableCell>
+                          <Skeleton className="size-6 ml-auto" />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
 
                 {students.map((s) => (
                   <TableRow key={s.id} className="hover:bg-muted/40 transition-colors">
                     <TableCell>
-                      <StudentAvatar
-                        photoUrl={s.photo_url}
-                        fullName={s.full_name}
-                        size="sm"
-                      />
+                      <StudentAvatar photoUrl={s.photo_url} fullName={s.full_name} size="sm" />
                     </TableCell>
                     <TableCell>
                       <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-muted">
                         {s.spr_id}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium text-foreground">
-                      {s.full_name}
-                    </TableCell>
+                    <TableCell className="font-medium text-foreground">{s.full_name}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {s.father_name ?? "—"}
                     </TableCell>

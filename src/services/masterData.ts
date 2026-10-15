@@ -59,7 +59,9 @@ export async function getCurrentAcademicYear(): Promise<AcademicYearOption | nul
 export async function listClasses(institutionId?: string): Promise<ClassOption[]> {
   let query = supabase
     .from("classes")
-    .select("id, name, section, institution_id, academic_year_id, institution:institutions(name, code)")
+    .select(
+      "id, name, section, institution_id, academic_year_id, institution:institutions(name, code)",
+    )
     .order("name")
     .order("section");
   if (institutionId) {
@@ -71,10 +73,7 @@ export async function listClasses(institutionId?: string): Promise<ClassOption[]
 }
 
 export async function listHouses(): Promise<HouseOption[]> {
-  const { data, error } = await supabase
-    .from("houses")
-    .select("id, name")
-    .order("name");
+  const { data, error } = await supabase.from("houses").select("id, name").order("name");
   if (error) throw error;
   return data ?? [];
 }

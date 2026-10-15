@@ -61,7 +61,9 @@ export function StudentImportDialog({
   const [parsing, setParsing] = useState(false);
   const [committing, setCommitting] = useState(false);
   const [validationResult, setValidationResult] = useState<ImportValidationResult | null>(null);
-  const [filterSeverity, setFilterSeverity] = useState<"ALL" | "ERROR" | "WARNING" | "VALID">("ALL");
+  const [filterSeverity, setFilterSeverity] = useState<"ALL" | "ERROR" | "WARNING" | "VALID">(
+    "ALL",
+  );
   const [fileName, setFileName] = useState<string | null>(null);
 
   function resetState() {
@@ -89,7 +91,9 @@ export function StudentImportDialog({
 
       setValidationResult(result);
       if (result.errorCount > 0) {
-        toast.error(`Validation found ${result.errorCount} row error(s). Please review the details below.`);
+        toast.error(
+          `Validation found ${result.errorCount} row error(s). Please review the details below.`,
+        );
       } else {
         toast.success(`Validated ${result.totalRows} student rows successfully.`);
       }
@@ -141,7 +145,8 @@ export function StudentImportDialog({
             Batch Student Excel Import (XLSX)
           </DialogTitle>
           <DialogDescription>
-            Download the official Excel template, fill in student records, and preview validation results before committing.
+            Download the official Excel template, fill in student records, and preview validation
+            results before committing.
           </DialogDescription>
         </DialogHeader>
 
@@ -186,7 +191,8 @@ export function StudentImportDialog({
                 {fileName ? `Selected: ${fileName}` : "Upload Completed XLSX Spreadsheet"}
               </p>
               <p className="text-xs text-muted-foreground max-w-sm">
-                Drag and drop your spreadsheet here or click below. All rows are validated in memory before any database write.
+                Drag and drop your spreadsheet here or click below. All rows are validated in memory
+                before any database write.
               </p>
               <Button
                 type="button"
@@ -228,7 +234,8 @@ export function StudentImportDialog({
                       className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600 px-2.5 py-1"
                       onClick={() => setFilterSeverity("WARNING")}
                     >
-                      <AlertTriangle className="mr-1 size-3" /> Warnings: {validationResult.warningCount}
+                      <AlertTriangle className="mr-1 size-3" /> Warnings:{" "}
+                      {validationResult.warningCount}
                     </Badge>
                   )}
                   {validationResult.errorCount > 0 && (
@@ -276,14 +283,17 @@ export function StudentImportDialog({
                           r.severity === "ERROR"
                             ? "bg-destructive/10"
                             : r.severity === "WARNING"
-                            ? "bg-amber-50/50 dark:bg-amber-950/20"
-                            : ""
+                              ? "bg-amber-50/50 dark:bg-amber-950/20"
+                              : ""
                         }
                       >
                         <TableCell className="text-center font-mono">{r.rowNumber}</TableCell>
                         <TableCell>
                           {r.severity === "VALID" && (
-                            <Badge variant="outline" className="text-emerald-600 border-emerald-300">
+                            <Badge
+                              variant="outline"
+                              className="text-emerald-600 border-emerald-300"
+                            >
                               Valid
                             </Badge>
                           )}
@@ -292,16 +302,16 @@ export function StudentImportDialog({
                               Warning
                             </Badge>
                           )}
-                          {r.severity === "ERROR" && (
-                            <Badge variant="destructive">Error</Badge>
-                          )}
+                          {r.severity === "ERROR" && <Badge variant="destructive">Error</Badge>}
                         </TableCell>
                         <TableCell className="font-medium">{r.fullName || "—"}</TableCell>
                         <TableCell>
                           {r.matchedClassId ? (
                             <span>{r.matchedClassName}</span>
                           ) : (
-                            <span className="text-destructive font-semibold">{r.rawClassName || "Missing"}</span>
+                            <span className="text-destructive font-semibold">
+                              {r.rawClassName || "Missing"}
+                            </span>
                           )}
                         </TableCell>
                         <TableCell>

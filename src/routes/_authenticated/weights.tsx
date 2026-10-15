@@ -1,13 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { PageHeader, ErrorState } from "@/components/layout/PageHeader";
 import { listCategories } from "@/services/categories";
 import { effectiveShare, formatPercent } from "@/lib/spr/calculation";
 
 export const Route = createFileRoute("/_authenticated/weights")({
-  head: () => ({ meta: [{ title: "Weight Management — SPR" }, { name: "description", content: "SPR category weights." }] }),
+  head: () => ({
+    meta: [
+      { title: "Weight Management — SPR" },
+      { name: "description", content: "SPR category weights." },
+    ],
+  }),
   component: WeightsPage,
 });
 
@@ -33,12 +46,22 @@ function WeightsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {q.isLoading && <TableRow><TableCell colSpan={3}><Skeleton className="h-32 w-full" /></TableCell></TableRow>}
+            {q.isLoading && (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <Skeleton className="h-32 w-full" />
+                </TableCell>
+              </TableRow>
+            )}
             {active.map((c) => (
               <TableRow key={c.id}>
                 <TableCell className="font-medium">{c.name}</TableCell>
-                <TableCell className="text-right font-mono text-xs">{c.weight.toFixed(10)}</TableCell>
-                <TableCell className="text-right tabular-nums">{formatPercent(effectiveShare(c.weight, total), 4)}</TableCell>
+                <TableCell className="text-right font-mono text-xs">
+                  {c.weight.toFixed(10)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatPercent(effectiveShare(c.weight, total), 4)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -53,7 +76,9 @@ function WeightsPage() {
           )}
         </Table>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">Editing weights (administrators only) will be added in a later phase.</p>
+      <p className="mt-4 text-sm text-muted-foreground">
+        Editing weights (administrators only) will be added in a later phase.
+      </p>
     </>
   );
 }

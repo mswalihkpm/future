@@ -27,7 +27,9 @@ function PlannedModule() {
         <Construction className="size-3.5" /> Not built yet — planned for a later phase
       </p>
       <div className="mt-6">
-        <Button asChild variant="outline"><Link to="/dashboard">Back to dashboard</Link></Button>
+        <Button asChild variant="outline">
+          <Link to="/dashboard">Back to dashboard</Link>
+        </Button>
       </div>
     </div>
   );

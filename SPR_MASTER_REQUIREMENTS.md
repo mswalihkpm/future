@@ -1,4 +1,5 @@
 # SPR Master Requirements Document
+
 **Institution**: Ma'din School of Excellence (MSOE), Malappuram, Kerala, India  
 **System**: Student Performance Rating (SPR) — Production Platform  
 **Target Specification**: Documented Original Final Feature Set & Architecture  
@@ -9,6 +10,7 @@
 ## 1. Executive Summary & Purpose
 
 The Student Performance Rating (SPR) application is a consolidated performance evaluation, rating, and public recognition platform for Ma'din School of Excellence. It synthesizes student achievements across:
+
 1. Academic School Studies (Kerala State Board & NCERT)
 2. Islamic Studies (Jamiathul Hind Al-Islamiyya & Ma'din Academy streams)
 3. Qualifications & Certifications (Hifz, Qira'at, etc.)
@@ -18,6 +20,7 @@ The Student Performance Rating (SPR) application is a consolidated performance e
 7. Library Reading (Imthiyaaz Library) & Classical Islamic Muthala (Kuthbkhana)
 
 The platform provides a dual-facing architecture:
+
 - **Public Portal**: Executive landing page, top 1st/2nd/3rd podium cards, master leaderboard with deterministic ties and zero-point handling, category visual directories, student dossier profiles, A4 Print Studio, news updates, student inaccuracy issue reporting, and TV/projector display mode.
 - **Administrative Suite**: Role-based access control, master data management, academic bulk mark entry with dynamic subject tables, creative submissions registry, literary competition score imports, Kuthbkhana classical text tracking, Imthiyaaz library on-demand synchronization, scoring weight management, global search (Ctrl+K), and audit logging.
 
@@ -60,6 +63,7 @@ The platform provides a dual-facing architecture:
 ## 3. Institutional Structure
 
 ### 3.1 Central & Partner Institutions
+
 - **Central Institution**: Ma'din School of Excellence (MSOE), Malappuram.
 - **Partner / Associated Institutions**:
   1. GBHS Malappuram
@@ -70,11 +74,13 @@ The platform provides a dual-facing architecture:
 - Configurable via database table `institutions` (no hardcoding).
 
 ### 3.2 Academic Classes & Divisions
+
 - Classes: Class 8, Class 9, Class 10, Class +1 (Grade 11), Class +2 (Grade 12).
 - Divisions: A, B, etc.
 - Configurable via `classes` referencing `institutions` and `academic_years`.
 
 ### 3.3 Syllabuses & Streams
+
 - **School Studies**: Kerala State Board & NCERT.
 - **Islamic Studies**: Jamiathul Hind Al-Islamiyya & Ma'din Academy.
 
@@ -83,16 +89,19 @@ The platform provides a dual-facing architecture:
 ## 4. Scoring Logic & Multipliers
 
 ### 4.1 Islamic Studies
+
 - Exam Scaled Score = $(\frac{\sum \text{Obtained Marks}}{\sum \text{Max Marks}}) \times \text{Exam Actual Max Score}$.
 - Default Exam Actual Max Score = 100.
 - Total Islamic Points = $\sum (\text{Exam Scaled Scores})$.
 
 ### 4.2 School Studies
+
 - Exam Scaled Score = $(\frac{\sum \text{Obtained Marks}}{\sum \text{Max Marks}}) \times \text{Exam Actual Max Score}$.
 - Default Exam Actual Max Score = 130.
 - Example: 90% in exam with actual max 130 = $117.00$ points.
 
 ### 4.3 Programmes & Literary Competitions
+
 - $\text{Earned Points} = \text{Base Score} \times \text{Prize Multiplier} \times \text{Level Multiplier}$.
 - **Prize Multipliers**:
   - 1st Prize: $2.0\times$
@@ -114,10 +123,12 @@ The platform provides a dual-facing architecture:
   - International: $5.00\times$
 
 ### 4.4 Qualification
+
 - $\text{Earned Points} = \text{Base Score} \times \text{Subcategory Weight} \times \text{Level Multiplier} \times \text{Prize Multiplier}$.
 - Subcategories: Hifz, Qira'at, specialized certificates.
 
 ### 4.5 Creative Hub
+
 - Direct points or: $\text{Earned Points} = \text{Form Base Score} \times \text{Media Weight}$.
 - **Form Base Scores**:
   - Research Paper: 100
@@ -128,6 +139,7 @@ The platform provides a dual-facing architecture:
 - **Published Media**: Newspaper, Magazine, Wall Magazine, Digital Portal, Journal.
 
 ### 4.6 Library & Reading
+
 - **Total Points** = Imthiyaaz Library Points + Kuthbkhana Classical Reading Points.
 - **Imthiyaaz Library Points**:
   - Full read: $(\frac{\text{Pages}}{10}) \times \text{Rate}$
@@ -143,16 +155,16 @@ The platform provides a dual-facing architecture:
 
 ## 5. User Roles and Access Control
 
-| Role | Permissions & Scope |
-|---|---|
-| `SUPER_ADMIN` | Unrestricted access: user management, master data, weights, scoring rules, all modules. |
-| `ADMIN` | Student management, academic mark entry, competitions, leaderboards. Restricted from altering master system settings. |
-| `CREATIVE_HUB_ADMIN` | Creative Hub submissions, approvals, and permitted views. |
-| `KUTHBKHANA_ADMIN` | Kuthbkhana classical reading entries, validations, and reports. |
-| `TEACHER` | Enter/edit marks for assigned academic classes and subjects. |
-| `VIEWER` | Read-only access to dossiers, public portal, and leaderboards. |
+| Role                 | Permissions & Scope                                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `SUPER_ADMIN`        | Unrestricted access: user management, master data, weights, scoring rules, all modules.                               |
+| `ADMIN`              | Student management, academic mark entry, competitions, leaderboards. Restricted from altering master system settings. |
+| `CREATIVE_HUB_ADMIN` | Creative Hub submissions, approvals, and permitted views.                                                             |
+| `KUTHBKHANA_ADMIN`   | Kuthbkhana classical reading entries, validations, and reports.                                                       |
+| `TEACHER`            | Enter/edit marks for assigned academic classes and subjects.                                                          |
+| `VIEWER`             | Read-only access to dossiers, public portal, and leaderboards.                                                        |
 
-*Compatibility Note*: In the Phase 1 schema, `app_role` has `admin`, `coordinator`, `teacher`, `viewer`. Role mapping supports these while enabling module-specific administrative delegations.
+_Compatibility Note_: In the Phase 1 schema, `app_role` has `admin`, `coordinator`, `teacher`, `viewer`. Role mapping supports these while enabling module-specific administrative delegations.
 
 ---
 

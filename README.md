@@ -7,12 +7,12 @@ This project will initially be scaffolded in Lovable and then pushed to GitHub. 
 
 TECHNOLOGY:
 
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
-* Supabase-compatible PostgreSQL architecture
-* Lovable Cloud for the initial database setup
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Supabase-compatible PostgreSQL architecture
+- Lovable Cloud for the initial database setup
 
 APPLICATION MODULES:
 
@@ -45,13 +45,13 @@ Support permanent, unique SPR Student IDs, student names, classes, house names, 
 
 DATABASE AND SECURITY:
 
-* Use a relational PostgreSQL schema.
-* Create appropriate primary keys, foreign keys, unique constraints, indexes, and timestamps.
-* Design role-based access control and secure authentication.
-* Do not expose service-role keys, private credentials, or passwords in frontend code.
-* Do not use hardcoded credentials as a security mechanism.
-* Avoid unnecessary database queries and fetching entire tables when only a subset of records is needed.
-* Keep database access logic modular and reusable.
+- Use a relational PostgreSQL schema.
+- Create appropriate primary keys, foreign keys, unique constraints, indexes, and timestamps.
+- Design role-based access control and secure authentication.
+- Do not expose service-role keys, private credentials, or passwords in frontend code.
+- Do not use hardcoded credentials as a security mechanism.
+- Avoid unnecessary database queries and fetching entire tables when only a subset of records is needed.
+- Keep database access logic modular and reusable.
 
 DESIGN:
 Create a modern, professional, responsive educational administration interface suitable for desktop and mobile devices. Use a clean academic visual style, intuitive navigation, accessible forms, data tables, search, filtering, pagination, loading states, and error states.

@@ -1,6 +1,6 @@
 /**
  * Authoritative Scoring & Performance Engine for Madin School of Excellence (SPR)
- * 
+ *
  * Rules:
  * 1. Scoring model: UNLIMITED NUMERICAL POINTS (Total = sum of earned category points).
  * 2. Standard Competition Ranking ("1, 1, 3" tie rules with skipped ranks).
@@ -18,27 +18,20 @@ export const PRIZE_MULTIPLIERS: Record<PrizePosition, number> = {
   "1st": 2.0,
   "2nd": 1.5,
   "3rd": 1.0,
-  "participation": 1.0,
-  "other": 1.0,
+  participation: 1.0,
+  other: 1.0,
 };
 
 export const DEFAULT_PRIZE_BASE_SCORES: Record<PrizePosition, number> = {
   "1st": 100,
   "2nd": 75,
   "3rd": 50,
-  "participation": 25,
-  "other": 25,
+  participation: 25,
+  other: 25,
 };
 
 export type FestivalLevel =
-  | "campus"
-  | "school"
-  | "division"
-  | "district"
-  | "daeera"
-  | "state"
-  | "national"
-  | "international";
+  "campus" | "school" | "division" | "district" | "daeera" | "state" | "national" | "international";
 
 export const FESTIVAL_LEVEL_MULTIPLIERS: Record<FestivalLevel, number> = {
   campus: 1.0,
@@ -77,11 +70,7 @@ export const CREATIVE_FORM_BASE_SCORES: Record<CreativeForm, number> = {
 };
 
 export type PublishedMedia =
-  | "newspaper"
-  | "magazine"
-  | "wall_magazine"
-  | "digital_portal"
-  | "journal";
+  "newspaper" | "magazine" | "wall_magazine" | "digital_portal" | "journal";
 
 export const PUBLISHED_MEDIA_WEIGHTS: Record<PublishedMedia, number> = {
   newspaper: 1.5,
@@ -199,8 +188,8 @@ export function calculateCreativePoints({
   if (directScore !== undefined && directScore !== null) {
     return Number(directScore.toFixed(2));
   }
-  const base = customFormBase ?? (form ? CREATIVE_FORM_BASE_SCORES[form] ?? 50 : 50);
-  const weight = customMediaWeight ?? (media ? PUBLISHED_MEDIA_WEIGHTS[media] ?? 1.0 : 1.0);
+  const base = customFormBase ?? (form ? (CREATIVE_FORM_BASE_SCORES[form] ?? 50) : 50);
+  const weight = customMediaWeight ?? (media ? (PUBLISHED_MEDIA_WEIGHTS[media] ?? 1.0) : 1.0);
   return Number((base * weight).toFixed(2));
 }
 
@@ -265,9 +254,7 @@ export function calculateKuthbkhanaPoints(baseScore: number, subcategoryWeight =
  * Points are unlimited and NOT capped at 100%.
  */
 export function calculateTotalSpr(categoryScores: number[] | Record<string, number>): number {
-  const values = Array.isArray(categoryScores)
-    ? categoryScores
-    : Object.values(categoryScores);
+  const values = Array.isArray(categoryScores) ? categoryScores : Object.values(categoryScores);
   const total = values.reduce((sum, v) => sum + (Number.isFinite(v) ? v : 0), 0);
   return Number(total.toFixed(2));
 }
@@ -305,12 +292,12 @@ export interface RankedLeaderboardEntry extends LeaderboardEntry {
  */
 export function calculateLeaderboardRanks(
   entries: LeaderboardEntry[],
-  options?: { isCategoryLeaderboard?: boolean }
+  options?: { isCategoryLeaderboard?: boolean },
 ): RankedLeaderboardEntry[] {
   const isCategory = options?.isCategoryLeaderboard ?? false;
 
   // Filter based on zero-point rule
-  let filtered = entries.filter((e) => (e.isActive ?? true));
+  let filtered = entries.filter((e) => e.isActive ?? true);
   if (isCategory) {
     filtered = filtered.filter((e) => e.earnedPoints > 0);
   }
