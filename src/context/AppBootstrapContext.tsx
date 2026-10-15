@@ -83,23 +83,21 @@ export function AppBootstrapProvider({ children }: { children: React.ReactNode }
       setBootstrapStatus('Connecting to SPR services...');
 
       const weights = {
-        academic: 35,
-        leaderboard: 35,
-        display: 15,
+        academic: 40,
+        leaderboard: 40,
         news: 10,
-        subcategories: 5,
+        subcategories: 10,
       };
 
       const completed = {
         academic: 0,
         leaderboard: 0,
-        display: 0,
         news: 0,
         subcategories: 0,
       };
 
       const calculateTotalProgress = () => {
-        return completed.academic + completed.leaderboard + completed.display + completed.news + completed.subcategories;
+        return completed.academic + completed.leaderboard + completed.news + completed.subcategories;
       };
 
       // 1. Parallel fetch: Academic Master Data (categories, classes, schools, etc.)
@@ -141,23 +139,7 @@ export function AppBootstrapProvider({ children }: { children: React.ReactNode }
           updateProgress(calculateTotalProgress());
         });
 
-      // 3. Parallel fetch: Display config
-      const displayPromise = fetch('/api/display')
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data) {
-            globalDisplayConfigCache = data;
-            setDisplayConfig(data);
-          }
-          completed.display = weights.display;
-          updateProgress(calculateTotalProgress(), 'Display configured');
-        })
-        .catch(() => {
-          completed.display = weights.display;
-          updateProgress(calculateTotalProgress());
-        });
-
-      // 4. Parallel fetch: News / Broadcasts
+      // 3. Parallel fetch: News / Broadcasts
       const newsPromise = fetch('/api/news')
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
@@ -173,7 +155,7 @@ export function AppBootstrapProvider({ children }: { children: React.ReactNode }
           updateProgress(calculateTotalProgress());
         });
 
-      // 5. Parallel fetch: Subcategories
+      // 4. Parallel fetch: Subcategories
       const subcategoriesPromise = fetch('/api/subcategories')
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
@@ -197,7 +179,6 @@ export function AppBootstrapProvider({ children }: { children: React.ReactNode }
       // Wait for all critical parallel requests to complete or timeout
       await Promise.race([
         Promise.allSettled([
-          displayPromise,
           academicPromise,
           leaderboardPromise,
           newsPromise,

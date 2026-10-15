@@ -41,25 +41,32 @@ export default function DisplayModePage() {
     return () => clearInterval(timer);
   }, []);
 
+  const isFetchingRef = useRef(false);
+
   const fetchDisplayData = async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
     try {
       const params = new URLSearchParams();
       if (selectedCategory) params.append('categoryId', selectedCategory);
       if (selectedClass) params.append('classId', selectedClass);
 
       const res = await fetch(`/api/display?${params.toString()}`);
-      const json = await res.json();
-      setData(json);
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      }
     } catch (err) {
       console.error('Display fetch error:', err);
     } finally {
+      isFetchingRef.current = false;
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDisplayData();
-    const interval = setInterval(fetchDisplayData, 15000); // 15s auto-refresh
+    const interval = setInterval(fetchDisplayData, 60000); // 60s auto-refresh
     return () => clearInterval(interval);
   }, [selectedCategory, selectedClass]);
 

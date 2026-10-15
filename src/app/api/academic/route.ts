@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       if (cached) {
         return NextResponse.json(cached, {
           headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
           },
         });
       }
@@ -74,7 +74,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(payload, {
       headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Cache-Control': forceRefresh
+          ? 'no-cache, no-store, must-revalidate'
+          : 'public, s-maxage=300, stale-while-revalidate=600',
       },
     });
   } catch (error: any) {

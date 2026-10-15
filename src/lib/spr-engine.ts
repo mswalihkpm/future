@@ -4,6 +4,7 @@ import { MissingDataRule, CategorySummary, StudentSPRProfile, LeaderboardEntry }
 // High-performance server-side in-memory cache with TTL for ultra-fast loading
 const leaderboardCache = new Map<string, { timestamp: number; data: LeaderboardEntry[] }>();
 const studentSPRProfileCache = new Map<string, { timestamp: number; data: StudentSPRProfile }>();
+const studentRanksCache = new Map<string, { timestamp: number; data: any }>();
 const inFlightLeaderboardPromises = new Map<string, Promise<LeaderboardEntry[]>>();
 let inFlightActiveStudentsPromise: Promise<any[]> | null = null;
 let cachedMissingDataRule: { timestamp: number; value: MissingDataRule } | null = null;
@@ -18,6 +19,7 @@ const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
 export function invalidateEngineCache() {
   leaderboardCache.clear();
   studentSPRProfileCache.clear();
+  studentRanksCache.clear();
   inFlightLeaderboardPromises.clear();
   inFlightActiveStudentsPromise = null;
   cachedActiveStudentsSnapshot = null;
@@ -873,110 +875,100 @@ async function getActiveStudentsSnapshot(): Promise<any[]> {
 
   inFlightActiveStudentsPromise = (async () => {
     try {
-      const [students, photoRecords] = await Promise.all([
-        prisma.student.findMany({
-          where: { status: 'ACTIVE' },
-          select: {
-            id: true,
-            studentId: true,
-            sprStudentId: true,
-            fullName: true,
-            division: true,
-            status: true,
-            classId: true,
-            schoolId: true,
-            academicYearId: true,
-            class: { select: { id: true, name: true, numericGrade: true } },
-            school: { select: { id: true, name: true, code: true } },
-            academicYear: { select: { id: true, name: true, isCurrent: true } },
-            performanceRecords: {
-              select: {
-                id: true,
-                categoryId: true,
-                subcategoryId: true,
-                examId: true,
-                subjectId: true,
-                competitionId: true,
-                literaryCompetitionId: true,
-                levelId: true,
-                obtainedScore: true,
-                maxScore: true,
-                position: true,
-                grade: true,
-                remarks: true,
-                category: { select: { id: true, code: true, name: true } },
-                subcategory: { select: { id: true, code: true, name: true, weight: true, maxScore: true } },
-                subject: {
-                  select: {
-                    id: true,
-                    name: true,
-                    maxScore: true,
-                    institution: { select: { id: true, code: true, name: true } },
-                    board: { select: { id: true, code: true, name: true } },
-                  },
-                },
-                exam: {
-                  select: {
-                    id: true,
-                    name: true,
-                    maxScore: true,
-                    termId: true,
-                    term: { select: { id: true, name: true } },
-                  },
-                },
-                competition: {
-                  select: {
-                    id: true,
-                    name: true,
-                    program: { select: { id: true, name: true } },
-                  },
-                },
-                literaryCompetition: {
-                  select: {
-                    id: true,
-                    name: true,
-                    event: { select: { id: true, name: true } },
-                  },
-                },
-                level: {
-                  select: {
-                    id: true,
-                    name: true,
-                    code: true,
-                    weightMultiplier: true,
-                  },
+      const students = await prisma.student.findMany({
+        where: { status: 'ACTIVE' },
+        select: {
+          id: true,
+          studentId: true,
+          sprStudentId: true,
+          fullName: true,
+          division: true,
+          status: true,
+          photoUrl: true,
+          classId: true,
+          schoolId: true,
+          academicYearId: true,
+          class: { select: { id: true, name: true, numericGrade: true } },
+          school: { select: { id: true, name: true, code: true } },
+          academicYear: { select: { id: true, name: true, isCurrent: true } },
+          performanceRecords: {
+            select: {
+              id: true,
+              categoryId: true,
+              subcategoryId: true,
+              examId: true,
+              subjectId: true,
+              competitionId: true,
+              literaryCompetitionId: true,
+              levelId: true,
+              obtainedScore: true,
+              maxScore: true,
+              position: true,
+              grade: true,
+              remarks: true,
+              category: { select: { id: true, code: true, name: true } },
+              subcategory: { select: { id: true, code: true, name: true, weight: true, maxScore: true } },
+              subject: {
+                select: {
+                  id: true,
+                  name: true,
+                  maxScore: true,
+                  institution: { select: { id: true, code: true, name: true } },
+                  board: { select: { id: true, code: true, name: true } },
                 },
               },
-            },
-            creativeWorks: {
-              select: {
-                id: true,
-                score: true,
-                title: true,
-                publicationStatus: true,
-                categoryId: true,
-                category: { select: { id: true, name: true, weight: true } },
+              exam: {
+                select: {
+                  id: true,
+                  name: true,
+                  maxScore: true,
+                  termId: true,
+                  term: { select: { id: true, name: true } },
+                },
               },
-            },
-            libraryRecords: {
-              select: {
-                id: true,
-                booksRead: true,
-                readingScore: true,
-                readingPeriod: true,
+              competition: {
+                select: {
+                  id: true,
+                  name: true,
+                  program: { select: { id: true, name: true } },
+                },
+              },
+              literaryCompetition: {
+                select: {
+                  id: true,
+                  name: true,
+                  event: { select: { id: true, name: true } },
+                },
+              },
+              level: {
+                select: {
+                  id: true,
+                  name: true,
+                  code: true,
+                  weightMultiplier: true,
+                },
               },
             },
           },
-        }),
-        prisma.student.findMany({
-          where: { status: 'ACTIVE', photoUrl: { not: null } },
-          select: { id: true },
-        }),
-      ]);
-
-      const photoSet = new Set(photoRecords.map((p) => p.id));
-      students.forEach((st: any) => {
-        st.hasPhoto = photoSet.has(st.id);
+          creativeWorks: {
+            select: {
+              id: true,
+              score: true,
+              title: true,
+              publicationStatus: true,
+              categoryId: true,
+              category: { select: { id: true, name: true, weight: true } },
+            },
+          },
+          libraryRecords: {
+            select: {
+              id: true,
+              booksRead: true,
+              readingScore: true,
+              readingPeriod: true,
+            },
+          },
+        },
       });
 
       cachedActiveStudentsSnapshot = { timestamp: Date.now(), data: students };
@@ -1408,7 +1400,7 @@ export async function calculateAllLeaderboards(filters?: {
       spr: finalScore,
       overallScore: finalScore,
       totalSprPoints: finalScore,
-      photoUrl: (student as any).hasPhoto ? `/api/students/${student.id}/photo` : null,
+      photoUrl: student.photoUrl || null,
       division: student.division,
       categoryPoints,
       categoryPercentages: categoryPoints,
@@ -1469,7 +1461,23 @@ export async function calculateFastStudentRanks(
   totalStudentsInClass: number;
   totalStudentsInSchool: number;
 }> {
-  const leaderboard = await calculateAllLeaderboards({ academicYearId });
+  const cacheKey = `${studentId}_${academicYearId || ''}_${classId || ''}_${schoolId || ''}`;
+  const now = Date.now();
+  const cached = studentRanksCache.get(cacheKey);
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  // Reuse master cached leaderboard if fresh to avoid duplicate heavy snapshot queries
+  let leaderboard: LeaderboardEntry[];
+  const masterKey = JSON.stringify({ academicYearId: academicYearId || undefined });
+  const cachedLeaderboard = leaderboardCache.get(masterKey) || leaderboardCache.get('{}');
+  if (cachedLeaderboard && now - cachedLeaderboard.timestamp < CACHE_TTL_MS) {
+    leaderboard = cachedLeaderboard.data;
+  } else {
+    leaderboard = await calculateAllLeaderboards({ academicYearId });
+  }
+
   const studentEntry = leaderboard.find((e) => e.studentId === studentId);
   const overallRank = studentEntry?.rank || 1;
 
@@ -1501,7 +1509,7 @@ export async function calculateFastStudentRanks(
     return 1;
   };
 
-  return {
+  const rankResult = {
     overallRank,
     classRank: computeTiedRank(classEntries, studentId),
     schoolRank: computeTiedRank(schoolEntries, studentId),
@@ -1509,5 +1517,8 @@ export async function calculateFastStudentRanks(
     totalStudentsInClass: classEntries.length,
     totalStudentsInSchool: schoolEntries.length,
   };
+
+  studentRanksCache.set(cacheKey, { timestamp: now, data: rankResult });
+  return rankResult;
 }
 
