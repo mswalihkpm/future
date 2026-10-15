@@ -75,7 +75,7 @@ function Dashboard() {
           <ul className="divide-y">
             {MODULES.filter((m) => m.slug !== "dashboard").map((m) => (
               <li key={m.slug}>
-                <Link to={m.status === "ready" ? `/${m.slug}` : `/modules/${m.slug}`} className="flex items-center gap-3 py-2.5 text-sm hover:text-primary">
+                <Link to={(m.status === "ready" ? `/${m.slug}` : `/modules/${m.slug}`) as string} className="flex items-center gap-3 py-2.5 text-sm hover:text-primary">
                   <m.icon className="size-4 text-muted-foreground" />
                   <span className="flex-1">{m.title}</span>
                   <Badge variant={m.status === "ready" ? "default" : "secondary"}>{m.status === "ready" ? "Available" : "Planned"}</Badge>
