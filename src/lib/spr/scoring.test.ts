@@ -219,23 +219,23 @@ describe("Authoritative SPR Scoring Engine", () => {
 
       // Ali and Zayd tied with 500 pts and 5 records
       // Ali comes first alphabetically, but both have Rank 1
-      expect(ranked[0].fullName).toBe("Ali");
-      expect(ranked[0].rank).toBe(1);
-      expect(ranked[0].tied).toBe(true);
-      expect(ranked[0].tiedCount).toBe(2);
+      expect(ranked[0]?.fullName).toBe("Ali");
+      expect(ranked[0]?.rank).toBe(1);
+      expect(ranked[0]?.tied).toBe(true);
+      expect(ranked[0]?.tiedCount).toBe(2);
 
-      expect(ranked[1].fullName).toBe("Zayd");
-      expect(ranked[1].rank).toBe(1);
-      expect(ranked[1].tied).toBe(true);
+      expect(ranked[1]?.fullName).toBe("Zayd");
+      expect(ranked[1]?.rank).toBe(1);
+      expect(ranked[1]?.tied).toBe(true);
 
       // Bilal skips Rank 2 and receives Rank 3
-      expect(ranked[2].fullName).toBe("Bilal");
-      expect(ranked[2].rank).toBe(3);
-      expect(ranked[2].tied).toBe(false);
+      expect(ranked[2]?.fullName).toBe("Bilal");
+      expect(ranked[2]?.rank).toBe(3);
+      expect(ranked[2]?.tied).toBe(false);
 
       // Umar with 0 points is included on overall leaderboard at rank 4
-      expect(ranked[3].fullName).toBe("Umar");
-      expect(ranked[3].rank).toBe(4);
+      expect(ranked[3]?.fullName).toBe("Umar");
+      expect(ranked[3]?.rank).toBe(4);
     });
 
     it("excludes 0-point students on category-specific leaderboards", () => {

@@ -124,11 +124,11 @@ export function calculateExamScaledScore({
 // ==========================================
 
 export interface CompetitionScoreInput {
-  baseScore?: number;
+  baseScore?: number | undefined;
   prizePosition: PrizePosition;
   level: FestivalLevel;
-  customPrizeMultiplier?: number;
-  customLevelMultiplier?: number;
+  customPrizeMultiplier?: number | undefined;
+  customLevelMultiplier?: number | undefined;
 }
 
 /**
@@ -156,9 +156,9 @@ export function calculateCompetitionPoints({
 
 export interface QualificationScoreInput {
   baseScore: number;
-  subcategoryWeight?: number;
-  levelMultiplier?: number;
-  prizeMultiplier?: number;
+  subcategoryWeight?: number | undefined;
+  levelMultiplier?: number | undefined;
+  prizeMultiplier?: number | undefined;
 }
 
 /**
@@ -179,11 +179,11 @@ export function calculateQualificationPoints({
 // ==========================================
 
 export interface CreativeHubScoreInput {
-  directScore?: number;
-  form?: CreativeForm;
-  media?: PublishedMedia;
-  customFormBase?: number;
-  customMediaWeight?: number;
+  directScore?: number | undefined;
+  form?: CreativeForm | undefined;
+  media?: PublishedMedia | undefined;
+  customFormBase?: number | undefined;
+  customMediaWeight?: number | undefined;
 }
 
 /**
@@ -212,10 +212,10 @@ export type LibraryReadingMode = "full" | "half" | "custom";
 
 export interface LibraryReadingScoreInput {
   totalPages: number;
-  pagesRead?: number;
+  pagesRead?: number | undefined;
   mode: LibraryReadingMode;
   ratePerTenPages: number; // Configured library rate (e.g. 1.0 per 10 pages)
-  reviewPoints?: number;
+  reviewPoints?: number | undefined;
 }
 
 /**
@@ -280,12 +280,12 @@ export interface LeaderboardEntry {
   studentId: string;
   sprId: string;
   fullName: string;
-  className?: string;
-  schoolName?: string;
+  className?: string | undefined;
+  schoolName?: string | undefined;
   earnedPoints: number;
   recordCount: number;
-  categoryBreakdown?: Record<string, number>;
-  isActive?: boolean;
+  categoryBreakdown?: Record<string, number> | undefined;
+  isActive?: boolean | undefined;
 }
 
 export interface RankedLeaderboardEntry extends LeaderboardEntry {
@@ -334,13 +334,16 @@ export function calculateLeaderboardRanks(
 
   for (let i = 0; i < sorted.length; i++) {
     const current = sorted[i];
+    if (!current) continue;
 
     // Determine how many students tie with this exact score and record count
     let tieCount = 1;
     for (let j = i + 1; j < sorted.length; j++) {
+      const next = sorted[j];
       if (
-        sorted[j].earnedPoints === current.earnedPoints &&
-        sorted[j].recordCount === current.recordCount
+        next &&
+        next.earnedPoints === current.earnedPoints &&
+        next.recordCount === current.recordCount
       ) {
         tieCount++;
       } else {
@@ -352,12 +355,15 @@ export function calculateLeaderboardRanks(
 
     // Assign rank to all tied entries
     for (let k = 0; k < tieCount; k++) {
-      ranked.push({
-        ...sorted[i + k],
-        rank: currentRank,
-        tied: isTied,
-        tiedCount: isTied ? tieCount : 1,
-      });
+      const item = sorted[i + k];
+      if (item) {
+        ranked.push({
+          ...item,
+          rank: currentRank,
+          tied: isTied,
+          tiedCount: isTied ? tieCount : 1,
+        });
+      }
     }
 
     // Skip to next distinct group, incrementing rank by tie count
@@ -390,9 +396,10 @@ export function isValidSprId(id: string): boolean {
 export function generateNextSprId(existingIds: string[]): string {
   let maxNum = 0;
   for (const id of existingIds) {
+    if (!id) continue;
     const normalized = normalizeSprId(id);
     const match = normalized.match(/^SPR(\d+)$/);
-    if (match) {
+    if (match && match[1]) {
       const num = parseInt(match[1], 10);
       if (!isNaN(num) && num > maxNum) {
         maxNum = num;

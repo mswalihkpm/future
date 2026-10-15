@@ -31,8 +31,10 @@
 | **Imthiyaaz Library Sync** | Exact SPR ID match, sync dashboard, rates | **MISSING** | `modules.$module.tsx` placeholder only. |
 | **Weight & Scoring Management**| Base scores & multipliers editor, calculation preview| **PARTIAL** | Static read-only table of 7 categories. Multiplier logic created; UI editor needed. |
 | **System Settings** | Master data (institutions, classes, subjects, etc.) | **MISSING** | `modules.$module.tsx` placeholder only. |
-| **Student Registry & Admin** | Search, filter, pagination, status ACTIVE/etc. | **PARTIAL** | Basic table present. Needs add/edit modal, sequential SPR ID generation, Excel import. |
-| **Excel Import / Export** | XLSX template, validation before commit | **MISSING** | Not implemented. |
+| **Student Registry & Admin** | Search, filter, pagination, add/edit, active/inactive | **WORKING** | Full registry with search, class/house/status filters, A-Z/SPR ID sorting, Add/Edit modal with auto SPR ID preview, and status toggling. |
+| **SPR Student ID** | Permanent, unique, format `/^SPR\d{4,}$/i` | **WORKING** | Sequential auto-generator (`generateNextSprId`), duplicate prevention, DB trigger `prevent_spr_id_change` immutability, exact-matching only. |
+| **Excel Import / Export** | Downloadable template, pre-commit validation, preview, export | **WORKING** | Full XLSX workflow: template download, row validation, duplicate SPR ID detection, pre-commit review table with Error/Warning tabs, batch insert, and XLSX registry export. |
+| **Student Photos** | Google Drive =s360 thumbnail conversion, Base64 rejection | **WORKING** | Utility `src/lib/media.ts` automatically converts Google Drive sharing URLs to direct 360px CDN thumbnails and strictly prohibits Base64 in PostgreSQL rows. Avatar fallback with initials. |
 | **Global Search (Ctrl+K)** | Search students, SPR ID, categories, news | **MISSING** | Not implemented. |
 | **PWA & Offline Shell** | Manifest, static shell caching, mobile nav | **PARTIAL** | Viewport & meta tags in place; manifest & service worker needed. |
 | **Egress Optimization** | Column projection, 60s in-memory cache, no Base64 | **PARTIAL** | Column selection in queries present; caching & thumbnail transforms needed. |
